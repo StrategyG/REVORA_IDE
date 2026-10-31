@@ -2,7 +2,7 @@
 
 REVORA IDE is being developed as a secure, revision-aware AI engineering workspace.
 
-> **Current release status: BLOCKED — foundation preview only.** This repository snapshot is not a production IDE. The editor can be previewed locally; identity, durable workspace persistence, AI generation, patch application, code execution, build/test orchestration, preview hosting, and production operations are not implemented.
+> **Current release status: BLOCKED — foundation preview only.** This repository snapshot is not a production IDE. The editor can be previewed locally, and domain-level workspace/patch contracts are tested; identity, durable workspace persistence, AI generation, authenticated server-side patch lifecycle, code execution, build/test orchestration, preview hosting, and production operations are not implemented.
 
 ## Repository baseline
 
@@ -56,7 +56,7 @@ The foundation branch has now been aligned to the ADR target for direct dependen
 - The lockfile is still absent. CI currently uses `npm install` temporarily; this is not a reproducible release installation. Push and PR CI passed at the current upgrade head, but that workflow does not yet prove reproducible dependency resolution.
 - G0 remains BLOCKED until npm generates and commits a valid `package-lock.json`, CI switches to `npm ci`, and the exact candidate SHA passes clean install, tests, build, and container verification.
 
-The dependency-version alignment is a code change, not evidence that Next.js 16 migration or production compatibility has passed. The current CI run must be inspected before accepting this upgrade.
+The dependency-version alignment is a code change, not evidence that Next.js 16 migration or production compatibility has passed. At upgrade head 73efb3ef1ccc5a0ed563dfdad0933a6f7d991de8, both push CI run 41241129461 and PR CI run 41241135044 passed, including syntax checks, unit tests, Next.js build, and Docker image build. This does not close the lockfile or production readiness gates.
 
 ## Run the local preview
 
