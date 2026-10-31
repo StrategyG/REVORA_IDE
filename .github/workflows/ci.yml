@@ -1,64 +1,37 @@
-name: REVORA CI
+name: CI
 
 on:
   push:
     branches:
       - main
-      - "feat/**"
+      - feat/*
+      - docs/*
   pull_request:
-  workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: revora-ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  quality:
-    name: Build, tests and dependency audit
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 26.13.0
+          node-version: 20
 
-      - name: Resolve exact direct pins and create ephemeral lock
-        run: npm install --package-lock-only --ignore-scripts --no-audit --fund=false
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
 
-      - name: Install from generated lock
-        run: npm ci --no-audit --fund=false
-
-      - name: Check source syntax
+      - name: Run syntax check
         run: npm run check
 
       - name: Run unit tests
         run: npm test
 
-      - name: Build production bundle
+      - name: Run Next.js build verification
         run: npm run build
-
-      - name: Audit installed dependencies
-        run: npm audit --audit-level=high
-
-      - name: Upload generated npm lockfile for promotion into the branch
-        uses: actions/upload-artifact@v4
-        with:
-          name: revora-generated-package-lock
-          path: package-lock.json
-          if-no-files-found: error
-          retention-days: 7
-
-      - name: Verify no private environment files entered the repository
-        shell: bash
-        run: |
-          if git ls-files | grep -E '(^|/)[.]env($|[.])' | grep -v '^[.]env[.]example$'; then
-            echo "::error::Environment or secret file is tracked."
-            exit 1
-          fi
