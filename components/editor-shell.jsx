@@ -238,7 +238,7 @@ export default function EditorShell() {
             <div className="editor-empty">Select a file from the explorer.</div>
           )}
           <div className="statusbar">
-            <span>{activePath.endsWith(".js") ? "JavaScript" : activePath.endsWith(".css") ? "CSS" : "Text / Markdown"}</span>
+            <span>{(activePath || "").endsWith(".js") ? "JavaScript" : (activePath || "").endsWith(".css") ? "CSS" : "Text / Markdown"}</span>
             <span>UTF-8</span>
             <span>Local draft</span>
             <span className="status-right">Ctrl/Cmd + S · Browser storage</span>
