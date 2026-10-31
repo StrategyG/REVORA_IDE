@@ -13,7 +13,7 @@ REVORA IDE is being developed as a secure, revision-aware AI engineering workspa
 - PR #4 is a draft review of the holistic upgrade branch into the foundation branch: https://github.com/StrategyG/REVORA_IDE/pull/4.
 - Branch protection was not enabled on the branches inspected in the baseline audit.
 
-The holistic upgrade branch adds planning documents and a limited toolchain alignment (Node 26.13.0, Next.js 16.4.3, React 19.3.1). It does not implement the missing platform services.
+The holistic upgrade branch adds the system blueprint, production execution plan, toolchain/CI alignment, and tested domain-level workspace/patch contracts. It does not yet implement the missing server platform services.
 
 ## What exists in the foundation preview
 
@@ -21,6 +21,8 @@ The holistic upgrade branch adds planning documents and a limited toolchain alig
 - CodeMirror 6 editor with basic tabs, file explorer, and file search.
 - Browser-local draft storage and workspace JSON export.
 - Client-side path guard for preview-only file creation.
+- Server-side Node domain helpers for deterministic workspace manifests, content SHA-256 integrity, revision-base conflict checks, patch schema validation, digest-bound approval verification, and in-memory candidate patch application.
+- Unit tests for workspace manifest integrity, revision conflicts, patch approval binding, operation preconditions, and prototype-pollution path rejection.
 - `GET /api/healthz` liveness endpoint.
 - `GET /api/readyz` returns HTTP 503 by design while required dependencies are absent.
 - Baseline HTTP security headers, non-root Docker image, CI workflow.
@@ -30,9 +32,9 @@ The holistic upgrade branch adds planning documents and a limited toolchain alig
 
 - User identity, secure sessions, project membership, and server-side object authorization.
 - Database schema/migrations and durable file/workspace storage.
-- Immutable revisions, optimistic concurrency, recovery checkpoints, and server-side path enforcement.
+- Durable immutable revision storage, server-side optimistic-concurrency transactions, recovery checkpoints, and authenticated server API enforcement. The current manifest and patch modules are pure domain contracts, not persistence or authorization services.
 - AI provider gateway, model routing, repository context indexing, or AI task orchestration.
-- Structured AI patch proposals, diff review, human approval, atomic apply, and rollback.
+- AI-generated patch proposals, interactive diff review, authenticated human approval, transactional server-side apply, audit events, and durable rollback. The current patch module validates a supplied proposal and returns an in-memory candidate only.
 - Terminal, build/test workers, isolated sandbox, or preview gateway.
 - Production-grade audit pipeline, monitoring, alerting, backup/restore, staging, and deployment.
 
@@ -75,7 +77,7 @@ npm test
 npm run build
 ```
 
-These commands verify only the current foundation. They do not prove production readiness.
+These commands verify the current foundation and pure domain contracts. They do not prove server integration or production readiness.
 
 ## Container preview
 
