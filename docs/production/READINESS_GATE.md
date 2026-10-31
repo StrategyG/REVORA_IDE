@@ -64,3 +64,13 @@ The upgrade branch now contains and tests:
 - In-memory patch candidate generation that validates all operation preconditions before producing a new workspace object; it does not mutate the input workspace.
 
 These are pure Node.js domain contracts. They do **not** authenticate the approver, persist revisions, provide a database transaction, create an audit record, expose an API, or implement durable rollback. The release gates remain PARTIAL/BLOCKED until those server-side services are built and tested.
+
+
+## CI evidence for domain-layer upgrade
+
+At commit `73efb3ef1ccc5a0ed563dfdad0933a6f7d991de8`:
+- Push CI [41241129461](https://github.com/StrategyG/REVORA_IDE/actions/runs/41241129461) — SUCCESS.
+- PR CI [41241135044](https://github.com/StrategyG/REVORA_IDE/actions/runs/41241135044) — SUCCESS.
+- Both runs completed dependency installation, syntax checks, unit tests, Next.js production build, and Docker image build.
+
+This validates the checks defined in the current workflow only. It does not establish reproducible installs because the lockfile is absent and CI still uses `npm install`; it also does not establish production readiness.
