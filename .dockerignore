@@ -1,0 +1,14 @@
+.git
+.github
+.next
+node_modules
+coverage
+test-results
+playwright-report
+.env
+.env.*
+!.env.example
+README.md
+REVORA_IDE_STAGE0_AUDIT
+REVORA_IDE_STAGE1_AUDIT
+docs
