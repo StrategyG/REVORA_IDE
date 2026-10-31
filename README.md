@@ -8,11 +8,12 @@ REVORA IDE is being developed as a secure, revision-aware AI engineering workspa
 
 - Default branch `main` is a bootstrap branch and contains only this README at the audited baseline.
 - The runnable editor foundation is on `feat/production-foundation-v1`.
-- The holistic architecture and production execution plan are being maintained on `feat/holistic-system-upgrade-v1`, based on the foundation branch.
+- The holistic architecture, production execution plan, and initial G0 toolchain alignment are on `feat/holistic-system-upgrade-v1`, based on the foundation branch.
 - PR #3 is a draft foundation PR and targets `docs/stage0-repository-audit-v42`. Review the branch/PR promotion topology before merging anything.
+- PR #4 is a draft review of the holistic upgrade branch into the foundation branch: https://github.com/StrategyG/REVORA_IDE/pull/4.
 - Branch protection was not enabled on the branches inspected in the baseline audit.
 
-The holistic plan branch adds planning documents only; it does not claim that the missing platform services are implemented.
+The holistic upgrade branch adds planning documents and a limited toolchain alignment (Node 26.13.0, Next.js 16.4.3, React 19.3.1). It does not implement the missing platform services.
 
 ## What exists in the foundation preview
 
@@ -50,7 +51,7 @@ The holistic plan branch adds planning documents only; it does not claim that th
 The foundation branch has now been aligned to the ADR target for direct dependencies and runtime:
 - Node.js 26.13.0 is declared in `.nvmrc`, `package.json`, CI, and Docker.
 - Next.js 16.4.3 and React/React DOM 19.3.1 are pinned in `package.json`.
-- The lockfile is still absent. CI currently uses `npm install` temporarily; this is not a reproducible release installation.
+- The lockfile is still absent. CI currently uses `npm install` temporarily; this is not a reproducible release installation. Push and PR CI passed at the current upgrade head, but that workflow does not yet prove reproducible dependency resolution.
 - G0 remains BLOCKED until npm generates and commits a valid `package-lock.json`, CI switches to `npm ci`, and the exact candidate SHA passes clean install, tests, build, and container verification.
 
 The dependency-version alignment is a code change, not evidence that Next.js 16 migration or production compatibility has passed. The current CI run must be inspected before accepting this upgrade.
