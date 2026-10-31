@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: revora-ci-\${{ github.workflow }}-\${{ github.ref }}
+  group: revora-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -30,8 +30,11 @@ jobs:
           node-version: 26.13.0
           cache: npm
 
-      - name: Install exact declared dependencies
-        run: npm install --no-audit --fund=false
+      - name: Resolve exact direct pins and create ephemeral lock
+        run: npm install --package-lock-only --ignore-scripts --no-audit --fund=false
+
+      - name: Install from generated lock
+        run: npm ci --no-audit --fund=false
 
       - name: Check source syntax
         run: npm run check
@@ -48,7 +51,7 @@ jobs:
       - name: Verify no private environment files entered the repository
         shell: bash
         run: |
-          if git ls-files | grep -E '(^|/)\\.env($|\\.)' | grep -v '^\\.env\\.example$'; then
+          if git ls-files | grep -E '(^|/)[.]env($|[.])' | grep -v '^[.]env[.]example$'; then
             echo "::error::Environment or secret file is tracked."
             exit 1
           fi
