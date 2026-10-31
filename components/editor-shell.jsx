@@ -6,6 +6,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import { oneDark } from "@codemirror/theme-one-dark";
 
 const STORAGE_KEY = "revora.foundation.workspace.v1";
+const MAX_FILE_BYTES = 1_000_000;
 const STARTER_FILES = {
   "README.md": "# REVORA IDE\n\nThis is a local foundation preview. Files are stored in this browser only.\n\nAuthentication, server persistence, AI generation, terminal, build and preview execution are intentionally disabled.\n",
   "src/main.js": 'function greet(name) {\n  return "Hello, " + name + "!";\n}\n\nconsole.log(greet("REVORA"));\n',
@@ -86,6 +87,10 @@ export default function EditorShell() {
   const activeContent = files[activePath] ?? "";
 
   function updateContent(value) {
+    if (new Blob([value]).size > MAX_FILE_BYTES) {
+      setNotice("Batas file preview adalah 1 MB; perubahan ini tidak disimpan.");
+      return;
+    }
     setFiles((current) => ({ ...current, [activePath]: value }));
     setNotice("Perubahan belum tersimpan");
   }
