@@ -434,3 +434,9 @@ A green build, successful unit tests, a working UI, or a 200 health endpoint alo
 | Operations | Runbook/readiness template only | Observability, SLOs, recovery and staging evidence |
 
 **Final status at this baseline: BLOCKED — foundation preview, not production-ready.**
+
+### Verified implementation progress — 2026-11-01
+
+On `feat/holistic-system-upgrade-v1`, the toolchain was aligned with ADR-0001 (Node.js 26.13.0, Next.js 16.4.3, React/React DOM 19.3.1), CI action versions were pinned to immutable SHAs, and a Docker image build was added to CI. Push run [41240390138](https://github.com/StrategyG/REVORA_IDE/actions/runs/41240390138) and PR run [41240394347](https://github.com/StrategyG/REVORA_IDE/actions/runs/41240394347) both passed at commit `0f0473dadff40a5367b4cd3eb0051bbacbfddb57`.
+
+This progress does not close G0: a generated and committed package lockfile, `npm ci`, branch protection, security scanning, and full release governance remain open. All product platform services listed above remain unimplemented.
