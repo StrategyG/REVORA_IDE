@@ -136,11 +136,9 @@ export default function EditorShell() {
   }
 
   function closeTab(path) {
-    setOpenPaths((current) => {
-      const next = current.filter((item) => item !== path);
-      if (activePath === path && next.length) setActivePath(next[next.length - 1]);
-      return next;
-    });
+    const next = openPaths.filter((item) => item !== path);
+    setOpenPaths(next);
+    if (activePath === path) setActivePath(next[next.length - 1] || "");
   }
 
   useEffect(() => {
