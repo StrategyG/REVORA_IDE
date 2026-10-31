@@ -45,21 +45,19 @@ The holistic plan branch adds planning documents only; it does not claim that th
 - [Go-live runbook template](docs/production/GO_LIVE_RUNBOOK.md)
 - [Historical Stage 0 audit](REVORA_IDE_STAGE0_AUDIT/EDITOR_AUDIT.md)
 
-## Toolchain alignment blocker
+## Toolchain status
 
-The architecture ADR targets Node.js 26.13.0, Next.js 16.4.3, and React 19.3.1. The current source configuration is not yet aligned:
+The foundation branch has now been aligned to the ADR target for direct dependencies and runtime:
+- Node.js 26.13.0 is declared in `.nvmrc`, `package.json`, CI, and Docker.
+- Next.js 16.4.3 and React/React DOM 19.3.1 are pinned in `package.json`.
+- The lockfile is still absent. CI currently uses `npm install` temporarily; this is not a reproducible release installation.
+- G0 remains BLOCKED until npm generates and commits a valid `package-lock.json`, CI switches to `npm ci`, and the exact candidate SHA passes clean install, tests, build, and container verification.
 
-- `package.json` currently declares Next.js 15.1.6 and React/React DOM 19.0.0.
-- `package.json` declares Node.js `>=20.0.0`.
-- CI currently uses Node.js 20.
-- Docker currently uses Node.js 26.13.0.
-- A committed `package-lock.json` is absent.
-
-Do not assume clean-install or deployment reproducibility until the manifest, lockfile, CI, Docker build/runtime, and local instructions use one reviewed baseline. The upgrade plan requires a generated lockfile and `npm ci` before release.
+The dependency-version alignment is a code change, not evidence that Next.js 16 migration or production compatibility has passed. The current CI run must be inspected before accepting this upgrade.
 
 ## Run the local preview
 
-Use the runtime selected by the toolchain ADR review. The current Dockerfile targets Node.js 26.13.0; the CI workflow and package manifest still differ and are pending alignment.
+Use Node.js 26.13.0 as pinned in `.nvmrc`. Until the lockfile is committed, dependency installation is still temporary and must not be used as proof of release reproducibility.
 
 ```bash
 npm install
