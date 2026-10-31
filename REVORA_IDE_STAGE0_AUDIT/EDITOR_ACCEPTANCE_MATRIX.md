@@ -29,9 +29,9 @@ A mockup, architecture diagram, documentation claim, model response, unexecuted 
 | S0-02 | All returned branches and their head SHAs recorded | PASS | E0-02; three branch refs recorded with SHAs |
 | S0-03 | Branch protection flag captured without overstating policy coverage | PASS | E0-02; API `protected=false` on all three refs; ruleset coverage is not claimed |
 | S0-04 | Default-branch recursive tree fully enumerated | PASS | E0-03; one blob (`README.md`); `truncated=false` |
-| S0-05 | Target-branch recursive tree fully enumerated | PASS | E0-04; 20 Markdown blobs; `truncated=false` |
-| S0-06 | Base-to-target branch comparison completed | PASS | E0-05; 25 ahead, 0 behind; 20 changed paths |
-| S0-07 | Target-to-prior-audit-branch comparison completed | PASS | E0-06; 12 ahead, 0 behind; six Stage 0 additions and six modifications |
+| S0-05 | Target-branch recursive tree fully enumerated | PASS | Initial inventory E0-04: 20 Markdown blobs; post-hardening revalidation R0-01: 22 Markdown blobs; `truncated=false` |
+| S0-06 | Base-to-target branch comparison completed | PASS | Initial snapshot E0-05: 25 ahead, 0 behind, 20 paths; latest verified head `9675e9b645e8e2df4ce2729ad8acb6418f8b6cb5`: 35 ahead, 0 behind, 22 changed paths |
+| S0-07 | Target-to-prior-audit-branch comparison completed | PASS | Initial snapshot E0-06: 12 ahead, 0 behind; latest verified head `9675e9b645e8e2df4ce2729ad8acb6418f8b6cb5`: 22 ahead, 0 behind, 14 changed paths |
 | S0-08 | File inventory classified for source, manifests, schemas, tests, CI and deployment | PASS | E0-03/E0-04/E0-10; no executable source or runtime/deployment artefacts in inspected trees |
 | S0-09 | Technology/framework/runtime discovery recorded without assumptions | PASS | E0-10; no application stack identified |
 | S0-10 | PR and issue endpoint results recorded | PASS | E0-07; empty arrays; this records endpoint results only |
@@ -45,6 +45,21 @@ A mockup, architecture diagram, documentation claim, model response, unexecuted 
 | S0-18 | Application regression/build/security tests executed | BLOCKED | No application source, manifest, test harness, or execution runtime exists in the inspected tree |
 
 **Stage 0 gate: PASS — remote repository discovery scope only.** S0-17 and S0-18 remain explicitly outside or blocked and do not become successful application checks.
+
+
+### 2.1 Latest ref revalidation
+
+The initial evidence values above are retained as historical snapshot data. They are not the current branch counts. At the latest ref check:
+
+- Audit branch head: `9675e9b645e8e2df4ce2729ad8acb6418f8b6cb5`.
+- Audit tree SHA: `0885499e4f359dbaa3a8935971e0c2c47a1f610f`; recursive response `truncated=false`; 22 Markdown blobs.
+- `main` → audit: 35 commits ahead, 0 behind; 22 changed paths.
+- `docs/stage1-editor-audit` → audit: 22 commits ahead, 0 behind; 14 changed paths.
+- Audit branch protection API field: `protected=false`; no broader ruleset guarantee is inferred.
+- Latest inspected commit status: zero status entries, combined state `pending`; zero check runs; zero workflow runs.
+- PR and issue endpoints returned empty arrays.
+
+The evidence ledger contains the initial and post-hardening snapshots. The latest branch head and comparisons above supersede the older counts when describing the current ref. These counts describe documentation branch history, not application implementation.
 
 ## 3. Product implementation acceptance matrix
 
