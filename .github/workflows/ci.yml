@@ -47,6 +47,14 @@ jobs:
       - name: Audit installed dependencies
         run: npm audit --audit-level=high
 
+      - name: Upload generated npm lockfile for promotion into the branch
+        uses: actions/upload-artifact@v4
+        with:
+          name: revora-generated-package-lock
+          path: package-lock.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Verify no private environment files entered the repository
         shell: bash
         run: |
