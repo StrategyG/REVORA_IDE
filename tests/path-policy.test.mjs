@@ -14,7 +14,7 @@ test("rejects traversal, absolute and drive-qualified paths", () => {
 });
 
 test("rejects Windows separators, control bytes and internal metadata folders", () => {
-  for (const path of ["src\\main.js", "src/\0secret", ".git/config", "node_modules/pkg/index.js", ".next/cache/x"]) {
+  for (const path of ["src\\main.js", "src/\0secret", ".git/config", "node_modules/pkg/index.js", ".next/cache/x", "__proto__/polluted.js", "src/constructor", "prototype/value"]) {
     assert.equal(validateWorkspacePath(path).ok, false, JSON.stringify(path));
   }
 });
