@@ -2,32 +2,43 @@
 
 **Stage:** 0 — Repository Audit and Technical Discovery  
 **Repository:** [StrategyG/REVORA_IDE](https://github.com/StrategyG/REVORA_IDE)  
-**Branch:** `docs/stage0-repository-audit-v42`  
-**Final gate:** **PASS — remote repository audit scope only**  
+**Working branch:** `docs/stage0-repository-audit-v42`  
+**Gate:** **PASS — remote repository discovery scope only**  
 **Product readiness:** **NOT READY**
 
-## Stage 0 deliverables
+## Authoritative Stage 0 documents
 
-1. [EDITOR_AUDIT.md](EDITOR_AUDIT.md) — repository identity, branch and file inventory, technology discovery, capability map, security findings, limitations, and Stage 0 acceptance.
-2. [EDITOR_ARCHITECTURE_MAP.md](EDITOR_ARCHITECTURE_MAP.md) — observed repository structure separated from proposed target architecture and component ownership boundaries.
-3. [EDITOR_IMPLEMENTATION_GAP.md](EDITOR_IMPLEMENTATION_GAP.md) — missing capabilities, dependency ordering, blockers, and implementation sequence.
-4. [EDITOR_ACCEPTANCE_MATRIX.md](EDITOR_ACCEPTANCE_MATRIX.md) — Stage 0 evidence checks, product acceptance tests, future E2E scenarios, and release decision rules.
-5. [STAGE0_COMPLETION_REPORT.md](STAGE0_COMPLETION_REPORT.md) — implementation inventory, actual checks, evidence, scope limitations, and final gate.
+Read these documents in order:
 
-## Key finding
+1. [STAGE0_EXECUTION_PROTOCOL.md](STAGE0_EXECUTION_PROTOCOL.md) — mandatory procedure, scope freeze, inspection order, evidence rules, status semantics, change control, and exit gate.
+2. [STAGE0_EVIDENCE_LEDGER.md](STAGE0_EVIDENCE_LEDGER.md) — pinned repository snapshot, direct evidence links, ref/tree SHAs, inventories, and explicit limits.
+3. [EDITOR_AUDIT.md](EDITOR_AUDIT.md) — repository facts, technology discovery, capability classification, security gaps, and Stage 1 prerequisites.
+4. [EDITOR_ARCHITECTURE_MAP.md](EDITOR_ARCHITECTURE_MAP.md) — observed repository map separated from the proposed target architecture.
+5. [EDITOR_IMPLEMENTATION_GAP.md](EDITOR_IMPLEMENTATION_GAP.md) — missing capabilities, dependency order, and implementation blockers.
+6. [EDITOR_ACCEPTANCE_MATRIX.md](EDITOR_ACCEPTANCE_MATRIX.md) — auditable Stage 0 checks, future product tests, and release decision rules.
+7. [STAGE0_COMPLETION_REPORT.md](STAGE0_COMPLETION_REPORT.md) — actual work performed, branch delta, readback verification, and final gate.
 
-The default branch `main` contains only `README.md`. The separate branch `docs/stage1-editor-audit` contains 13 Markdown audit/blueprint files. No application source, framework manifest, lockfile, API implementation, database schema, automated test suite, CI workflow, or deployment definition was found in the inspected remote repository.
+## Snapshot conclusion
 
-The documentation branch is a design/audit package, not an implemented editor.
+At the pinned evidence snapshot, the default branch `main` had one file (`README.md`). The inspected Stage 0 branch tree had 20 Markdown files and no application source, manifest, lockfile, schema/migration, test harness, workflow definition, or deployment manifest. The recursive tree response was complete (`truncated=false`).
 
-## Branch protection and scope
+The branch/PR/workflow/status observations are recorded in the evidence ledger. Empty PR, issue, workflow, or check responses are not interpreted as successful CI.
 
-- This package is maintained on a dedicated documentation branch.
-- `main` and the prior audit branch were not modified.
-- No merge or deployment was performed.
-- Local clones and external infrastructure remain **NOT VERIFIED**.
-- Stage 1 implementation is not started by this package.
+## Required status distinction
 
-## Required next stage
+- **Stage 0 PASS:** repository discovery completed for the stated remote GitHub scope.
+- **Application tests:** BLOCKED because no application source/runtime was present in the inspected tree.
+- **Local clones/external infrastructure:** NOT VERIFIED because they were not accessed.
+- **Product readiness:** NOT READY.
+- **Stage 1 — Architecture and Data Contract:** not started.
 
-Stage 1 — Architecture and Data Contract — may begin after this Stage 0 PASS. It must decide the workspace source of truth, entity contracts, revision/concurrency semantics, backend authorization, API/event contracts, provider governance, and sandbox trust boundary before UI implementation.
+## Historical material
+
+`REVORA_IDE_STAGE1_AUDIT/` is retained as earlier discovery and proposed design material. It is not the current Stage 1 implementation and must not be used as proof of implemented features. Applicable design proposals are candidates for review during Stage 1.
+
+## Change-control boundary
+
+- Audit work remains on the dedicated documentation branch.
+- The default branch `main` is not modified by this package.
+- No merge, deployment, source-code implementation, secret change, or destructive file operation is authorized by Stage 0.
+- Stage 1 must be separately tracked and must start from reviewed architecture/data-contract decisions.
