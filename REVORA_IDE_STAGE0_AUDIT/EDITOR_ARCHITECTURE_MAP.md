@@ -1,25 +1,40 @@
 # REVORA IDE — Repository and Target Architecture Map
 
-**Audit date:** 2026-10-31  
+**Evidence snapshot:** 2026-10-31  
+**Observed audit-branch commit:** `56fcb4ab87afc721584d3a8791ef906f47a820ac`  
+**Observed tree SHA:** `f12a9e07115158c2dce9c61d214a2607a02a4c59`  
 **Scope:** Remote repository structure and proposed target boundaries  
-**Important:** The target architecture below is a recommendation. It is not an architecture currently implemented in REVORA_IDE.
+**Important:** Only the observed repository maps below are factual. The target architecture is a proposal and is not implemented in REVORA IDE.
 
 ## 1. Current repository map — observed
 
-### Default branch: main
+### 1.1 Default branch: `main`
 
-~~~text
+At the pinned main commit, the complete recursive tree contains one file:
+
+```text
 StrategyG/REVORA_IDE/
 └── README.md
-~~~
+```
 
-The README describes a repository initialization/bootstrap commit and states that application implementation and deployment are not included.
+Main commit: `b309733779d9bfc2133e9bdacca5899699a9b84e`.
 
-### Existing documentation branch: docs/stage1-editor-audit
+### 1.2 Stage 0 audit branch: `docs/stage0-repository-audit-v42`
 
-~~~text
+At the observed tree SHA, the complete recursive tree contains 22 Markdown blobs and reports `truncated=false`:
+
+```text
 StrategyG/REVORA_IDE/
 ├── README.md
+├── REVORA_IDE_STAGE0_AUDIT/
+│   ├── EDITOR_ACCEPTANCE_MATRIX.md
+│   ├── EDITOR_ARCHITECTURE_MAP.md
+│   ├── EDITOR_AUDIT.md
+│   ├── EDITOR_IMPLEMENTATION_GAP.md
+│   ├── README.md
+│   ├── STAGE0_COMPLETION_REPORT.md
+│   ├── STAGE0_EVIDENCE_LEDGER.md
+│   └── STAGE0_EXECUTION_PROTOCOL.md
 └── REVORA_IDE_STAGE1_AUDIT/
     ├── EDITOR_ACCEPTANCE_MATRIX.md
     ├── EDITOR_ACCEPTANCE_MATRIX_UPLOAD.md
@@ -34,15 +49,24 @@ StrategyG/REVORA_IDE/
     ├── EDITOR_SECURITY_AUDIT.md
     ├── EDITOR_STAGE_2_BLUEPRINT.md
     └── README.md
-~~~
+```
 
-The two acceptance-matrix files have identical content. All files in this directory are Markdown documentation. The remote branch comparison showed 13 commits ahead of main and 0 behind.
+This tree consists of:
+- one root README;
+- eight files in the authoritative Stage 0 package;
+- 13 earlier discovery/design documents retained as historical material.
 
-No frontend, backend, package manifest, lockfile, migration, test, workflow, infrastructure, or deployment file is present in the inspected remote branch trees.
+No executable application source, package/runtime manifest, lockfile, schema/migration, test harness, workflow definition, infrastructure manifest, or deployment definition appears in this complete tree.
+
+### 1.3 Earlier documentation branch: `docs/stage1-editor-audit`
+
+This branch is the parent discovery/design baseline, not the current Stage 1 architecture workstream. It contains the earlier `REVORA_IDE_STAGE1_AUDIT/` Markdown material. The two acceptance-matrix files have identical content. Its relationship to main and the Stage 0 branch is recorded in the evidence ledger.
+
+The directory name `REVORA_IDE_STAGE1_AUDIT/` must not be interpreted as proof that current Stage 1 data contracts or architecture have been accepted.
 
 ## 2. Current technical architecture — evidence-based status
 
-There is no executable system architecture to map. The following components have no implementation evidence:
+There is no executable application architecture to map. At the observed repository tree, the following implementation components have no source evidence:
 
 | Component | Current repository evidence |
 |---|---|
@@ -66,9 +90,9 @@ There is no executable system architecture to map. The following components have
 
 No implementation framework, database product, cloud provider, or editor library can be inferred from the repository.
 
-## 3. Proposed logical target architecture
+## 3. Proposed logical target architecture — not implemented
 
-The recommended baseline is a modular application backend for transactional product operations, paired with separate workers and an isolated execution runtime. This avoids premature microservices while preserving the security boundary around untrusted code.
+The proposed baseline is a modular application backend for transactional product operations, with separately isolated workers and an execution runtime. This avoids premature microservices while preserving a security boundary around untrusted code.
 
 ~~~mermaid
 flowchart TB
@@ -94,7 +118,7 @@ flowchart TB
   Approval --> DB
 ~~~
 
-All boxes in this diagram are proposed components, not verified services.
+Every box in the diagram is a proposal, not a verified deployed component.
 
 ## 4. Component ownership boundaries
 
@@ -106,7 +130,7 @@ All boxes in this diagram are proposed components, not verified services.
 - Diff/patch review and user approval controls.
 - AI assistant panel and context provenance display.
 - Workbench tabs for problems, terminal, output, debug, tests, logs, and agent activity.
-- Save/recovery/permission/error indicators.
+- Save, recovery, permission, and error indicators.
 
 The frontend is not an authority for access control, revision integrity, patch authorization, or command execution.
 
@@ -173,11 +197,11 @@ Every relevant operation must carry, validate, and record the identity chain:
 - Artifact ID/digest and source revision for preview.
 - Actor/agent identity and approval record for protected actions.
 
-A file shown in the editor, a file sent to the AI model, a file included in a patch, a file used by a build, and a file opened in preview must resolve to the same project/workspace/revision lineage.
+A file shown in the editor, sent to the AI model, included in a patch, used by a build, and opened in preview must resolve to the same project/workspace/revision lineage.
 
 ## 6. Suggested module decomposition
 
-Do not create one microservice per module by default. A modular monolith can host the transactional domains initially, while worker and sandbox processes remain separately isolated.
+Do not create one microservice per module by default. A modular monolith can host transactional domains initially, while worker and sandbox processes remain separately isolated.
 
 | Module | Primary responsibility | Trust level |
 |---|---|---|
@@ -194,7 +218,7 @@ Do not create one microservice per module by default. A modular monolith can hos
 
 ## 7. Decisions deliberately not made in Stage 0
 
-These are Stage 1 architecture decisions, not facts discoverable from an empty application baseline:
+These are Stage 1 architecture decisions, not facts discoverable from a documentation-only repository baseline:
 
 - Frontend and backend frameworks and versions.
 - Code editor library and license.
@@ -208,3 +232,12 @@ These are Stage 1 architecture decisions, not facts discoverable from an empty a
 - Realtime event transport and collaborative-editing strategy.
 
 Do not install dependencies or create application directories until the relevant decisions have been recorded and justified.
+
+## 8. Audit procedure references
+
+- [Stage 0 execution protocol](STAGE0_EXECUTION_PROTOCOL.md)
+- [Stage 0 evidence ledger](STAGE0_EVIDENCE_LEDGER.md)
+- [Repository audit](EDITOR_AUDIT.md)
+- [Acceptance matrix](EDITOR_ACCEPTANCE_MATRIX.md)
+
+The repository map is descriptive. The proposed target architecture is advisory and must be validated and approved during Stage 1.
