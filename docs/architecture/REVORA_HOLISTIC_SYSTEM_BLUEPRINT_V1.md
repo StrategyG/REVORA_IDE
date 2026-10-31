@@ -423,7 +423,7 @@ A green build, successful unit tests, a working UI, or a 200 health endpoint alo
 | Editor UI | Implemented foundation preview | Keep and modularize |
 | Workspace | Browser localStorage only | Durable server workspace and recovery |
 | Branch/release governance | Main is README-only; feature branch holds code; PR #3 is draft; branches unprotected | Establish guarded release topology |
-| Dependencies | Package versions do not match ADR; CI and Docker Node versions differ; no lockfile | Align and reproduce builds |
+| Dependencies | Upgrade branch aligns Node 26.13.0, Next.js 16.4.3 and React 19.3.1; lockfile is still absent and CI still uses npm install | Complete lockfile, npm ci, scanning, and protected branch policy |
 | Backend/API | Health/readiness only | Versioned domain API and auth middleware |
 | Identity/authorization | Not implemented | Identity + tenant/object-level policy |
 | Database/storage | Not implemented | Metadata DB + immutable blob storage |
