@@ -394,23 +394,29 @@ Use machine-readable status where possible; never use unverified screenshots or 
 
 ## 11. Verified progress update — 2026-11-01
 
-The following G0 changes have been committed on `feat/holistic-system-upgrade-v1`:
+G0 has partial implementation on `feat/holistic-system-upgrade-v1`:
 
 - `.nvmrc` pins Node.js 26.13.0.
-- `package.json` now requires Node.js `>=26.13.0 <27` and pins Next.js 16.4.3 plus React/React DOM 19.3.1.
-- CI now selects Node.js 26.13.0. Docker already used Node.js 26.13.0.
-- README now describes the actual remaining toolchain gate and links this plan and the holistic architecture blueprint.
+- `package.json` requires Node.js `>=26.13.0 <27` and pins Next.js 16.4.3 plus React/React DOM 19.3.1, matching ADR-0001.
+- CI selects Node.js 26.13.0, with concurrency cancellation and a 20-minute job timeout.
+- GitHub Actions `checkout` and `setup-node` are pinned to immutable commit SHAs.
+- CI verifies dependency installation, syntax, unit tests, Next.js build, and Docker production-image build.
+- README accurately documents the implementation and release blockers.
 
-Evidence:
-- Upgrade branch head: `d9e4c9655ed996c7b236d31edc17c8497c84f658`.
-- Push CI run: [41240262430](https://github.com/StrategyG/REVORA_IDE/actions/runs/41240262430) — SUCCESS. Dependency install, syntax check, unit tests, and Next.js build passed.
-- PR CI run: [41240267731](https://github.com/StrategyG/REVORA_IDE/actions/runs/41240267731) — SUCCESS.
-- Draft PR: [#4](https://github.com/StrategyG/REVORA_IDE/pull/4), targeting `feat/production-foundation-v1`; it remains unmerged.
+Evidence at upgrade branch head `0f0473dadff40a5367b4cd3eb0051bbacbfddb57`:
+- Push CI [41240390138](https://github.com/StrategyG/REVORA_IDE/actions/runs/41240390138) — SUCCESS, including the Docker production-image build.
+- PR CI [41240394347](https://github.com/StrategyG/REVORA_IDE/actions/runs/41240394347) — SUCCESS.
+- Earlier Next.js 16/React 19.3.1 alignment was validated at commit `d9e4c9655ed996c7b236d31edc17c8497c84f658` by push run 41240262430 and PR run 41240267731.
+- Draft PR [#4](https://github.com/StrategyG/REVORA_IDE/pull/4) targets `feat/production-foundation-v1` and remains unmerged.
 
-G0 is still not PASS: there is no committed `package-lock.json`, CI still uses `npm install`, branch protection/rulesets are not enabled, and dependency/license/secret scanning plus container verification have not been proven. The CI result proves only the checks currently defined in that workflow.
+G0 is **PARTIAL, not PASS**:
+- No committed `package-lock.json`; CI still uses `npm install`, not `npm ci`.
+- Branch protection/rulesets and required review policies are not enabled.
+- Dependency/license/secret scanning, accessibility, E2E, security, load, staging, backup/restore, and rollback gates are not yet configured or proven.
+- CI success verifies only the jobs currently present in the workflow. A successful image build is not a sandbox isolation test or production deployment test.
 
 ## 12. Current release decision
 
 **BLOCKED — foundation preview only.**
 
-The completed work improves architecture clarity and aligns the toolchain on a review branch. It does not implement identity, authorization, durable data, AI, patch approval, sandbox execution, operations, or a production deployment.
+The completed work establishes an architecture/upgrade plan, aligns the toolchain on a review branch, pins CI actions, and validates a Next.js/Docker build. It does not implement identity, authorization, durable workspace data, immutable revisions, AI, patch approval, sandbox execution, production operations, or a deployment. G1–G9 remain open.
