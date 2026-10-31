@@ -420,3 +420,18 @@ G0 is **PARTIAL, not PASS**:
 **BLOCKED — foundation preview only.**
 
 The completed work establishes an architecture/upgrade plan, aligns the toolchain on a review branch, pins CI actions, and validates a Next.js/Docker build. It does not implement identity, authorization, durable workspace data, immutable revisions, AI, patch approval, sandbox execution, production operations, or a deployment. G1–G9 remain open.
+
+
+## 14. Domain-layer implementation update — 2026-11-01
+
+Implemented on `feat/holistic-system-upgrade-v1`:
+- Deterministic workspace manifest generation and verification with per-file SHA-256, byte quotas, stable ordering, and revision digest.
+- Stale revision conflict contract.
+- Bounded patch proposal validation (schema, operations, path policy, file/aggregate byte limits).
+- Patch digest and expiry-bound approval-record verification.
+- In-memory candidate patch application with create/update/delete preconditions and no mutation of the input object.
+- Prototype-pollution path segment rejection and regression tests.
+
+These modules are deliberately not exposed as an API and do not claim to provide authentication, authorization, persistence, transactional database commit, audit logging, or durable rollback. They are tested domain-layer building blocks for G1/G2/G4; the corresponding production gates remain PARTIAL/BLOCKED.
+
+The current CI workflow executes all `tests/*.test.mjs` and syntax-checks the new domain modules. Passing CI must be confirmed at the exact latest branch SHA before this change is accepted.
