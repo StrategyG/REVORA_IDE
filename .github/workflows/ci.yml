@@ -1,0 +1,54 @@
+name: REVORA CI
+
+on:
+  push:
+    branches:
+      - main
+      - "feat/**"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: revora-ci-\${{ github.workflow }}-\${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Build, tests and dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 26.13.0
+          cache: npm
+
+      - name: Install exact declared dependencies
+        run: npm install --no-audit --fund=false
+
+      - name: Check source syntax
+        run: npm run check
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Audit installed dependencies
+        run: npm audit --audit-level=high
+
+      - name: Verify no private environment files entered the repository
+        shell: bash
+        run: |
+          if git ls-files | grep -E '(^|/)\\.env($|\\.)' | grep -v '^\\.env\\.example$'; then
+            echo "::error::Environment or secret file is tracked."
+            exit 1
+          fi
