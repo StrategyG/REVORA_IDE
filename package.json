@@ -10,7 +10,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "check": "node --check next.config.mjs && node --check lib/path-policy.mjs && node --check app/api/healthz/route.js && node --check app/api/readyz/route.js",
+    "check": "node --check next.config.mjs && node --check lib/path-policy.mjs && node --check lib/workspace-manifest.mjs && node --check lib/patch-contract.mjs && node --check app/api/healthz/route.js && node --check app/api/readyz/route.js",
     "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
