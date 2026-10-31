@@ -1,44 +1,67 @@
 # REVORA IDE
 
-REVORA IDE is at the **repository discovery and architecture-definition stage**. The inspected remote repository does not yet contain a verified application implementation.
+REVORA IDE is being built as a secure, revision-aware AI engineering workspace.
 
-## Current status
+## Current branch status
 
-- **Stage 0 — Repository Audit:** PASS for the explicitly scoped remote GitHub repository inspection.
-- **Stage 1 — Architecture and Data Contract:** NOT STARTED.
-- **Application implementation, build, automated tests and production readiness:** NOT READY.
-- **Application build/test/security checks:** BLOCKED because no application source, manifest, test harness or runtime was found in the inspected tree.
-- **Local working trees and external infrastructure:** NOT VERIFIED.
-- **Default branch:** `main`.
-- **Audit branch:** `docs/stage0-repository-audit-v42`.
+This branch adds the first runnable web editor foundation. It is a **local browser preview**, not a production IDE. It does not yet provide authentication, server persistence, AI generation, code execution, build/test jobs, or deployment.
 
-A Stage 0 PASS is an audit-process result. It does not mean the editor or any product capability has passed acceptance.
+### Available now
 
-## Start here — Stage 0 evidence package
+- Responsive Next.js App Router shell
+- CodeMirror 6 editor with file tabs and explorer
+- Local browser draft persistence and workspace JSON export
+- Client-side path guard for preview-only file creation
+- Liveness endpoint: GET /api/healthz
+- Explicit readiness endpoint: GET /api/readyz (returns HTTP 503 by design)
+- Baseline security headers, non-root Docker image and CI workflow
+- Unit tests for the path-policy helper
 
-Open [REVORA_IDE_STAGE0_AUDIT/README.md](REVORA_IDE_STAGE0_AUDIT/README.md) for the authoritative sequence.
+### Not enabled
 
-1. [Execution protocol](REVORA_IDE_STAGE0_AUDIT/STAGE0_EXECUTION_PROTOCOL.md) — repeatable audit method, status definitions, controls and exit gate.
-2. [Evidence ledger](REVORA_IDE_STAGE0_AUDIT/STAGE0_EVIDENCE_LEDGER.md) — pinned refs, commit/tree SHAs, direct evidence links and limitations.
-3. [Repository audit](REVORA_IDE_STAGE0_AUDIT/EDITOR_AUDIT.md) — actual repository baseline, technology discovery and capability classification.
-4. [Architecture map](REVORA_IDE_STAGE0_AUDIT/EDITOR_ARCHITECTURE_MAP.md) — observed repository structure separated from proposed target design.
-5. [Implementation gaps](REVORA_IDE_STAGE0_AUDIT/EDITOR_IMPLEMENTATION_GAP.md) — missing functionality, dependencies and blockers.
-6. [Acceptance matrix](REVORA_IDE_STAGE0_AUDIT/EDITOR_ACCEPTANCE_MATRIX.md) — Stage 0 evidence checks and future product acceptance tests.
-7. [Completion report](REVORA_IDE_STAGE0_AUDIT/STAGE0_COMPLETION_REPORT.md) — performed actions, verification results and gate decision.
+- User authentication and project/workspace authorization
+- Durable database and file persistence
+- Server-enforced path policy, revision history and optimistic concurrency
+- AI provider gateway, context provenance, patch review and approval
+- Terminal, build/test workers, sandbox runtime and preview gateway
+- Production backups, monitoring, deployment and rollback
 
-## Repository baseline
+## Run locally
 
-At the pinned Stage 0 evidence snapshot, `main` contained only `README.md`. The audit branch's complete recursive tree contained 20 Markdown files and no executable application source, package/runtime manifest, lockfile, database schema, test harness, CI workflow, or deployment definition.
+Requirements: Node.js 26.13.0 or later.
 
-The exact snapshot, branch comparisons, workflow/status results, and full path inventory are documented in the evidence ledger. Refresh the evidence before relying on it after branch heads change.
+    npm install
+    npm run dev
 
-## Earlier discovery documents
+Open http://localhost:3000.
 
-`REVORA_IDE_STAGE1_AUDIT/` contains earlier discovery and proposed design notes. They are retained as historical inputs; they are not proof of implemented capabilities and are not the current Stage 1 architecture contracts. Reconcile and promote applicable proposals during Stage 1.
+Run checks:
 
-## Change-control policy
+    npm run check
+    npm test
+    npm run build
 
-- Keep audit and architecture work on dedicated branches.
-- Do not merge to `main`, deploy, or claim production readiness without explicit authorization and evidence-based acceptance gates.
-- Do not infer application code, services, tests, or infrastructure from documentation.
-- Do not execute arbitrary generated code on a production host.
+## Container
+
+    docker build -t revora-ide:foundation .
+    docker run --rm -p 3000:3000 revora-ide:foundation
+
+The container is non-root and exposes a liveness healthcheck. This does not mean product readiness has passed.
+
+## Architecture and security
+
+- Platform ADR: docs/architecture/ADR-0001-platform-stack.md
+- Threat model: docs/security/THREAT_MODEL.md
+- Production readiness gate: docs/production/READINESS_GATE.md
+- Go-live runbook: docs/production/GO_LIVE_RUNBOOK.md
+- Historical Stage 0 audit: REVORA_IDE_STAGE0_AUDIT/EDITOR_AUDIT.md
+
+## Release rule
+
+Production promotion is blocked until every security-critical readiness item has passing evidence at the exact release SHA. The readiness endpoint returns 503 until the missing identity, data, security, runtime, operations and recovery integrations are implemented and verified.
+
+No secrets belong in this repository. Use a deployment secret manager. Never expose a Supabase service-role/secret key or AI provider credential through a NEXT_PUBLIC variable.
+
+## Technology baseline
+
+The foundation uses Node.js 26 LTS, Next.js 16.4.3, React 19.3.1 and CodeMirror 6. Exact direct package versions are pinned in package.json. A committed package-lock.json is still required before production approval.
