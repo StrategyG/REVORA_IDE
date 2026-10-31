@@ -1,4 +1,4 @@
-# REVORA IDE — Stage 2 Technical Blueprint
+> **CURRENT-STATE CORRECTION (2026-10-31):** This document records an earlier bootstrap-state snapshot. The current audit branch `docs/stage0-repository-audit-v42` contains documentation-only audit packages, including `REVORA_IDE_STAGE0_AUDIT/` and the retained historical notes in this directory. The default branch `main` still contains only its bootstrap README. No application source, executable project manifest, test harness, or deployment implementation has been verified. Stage 0 is **PASS** for remote audit scope; Stage 1 — Architecture and Data Contract — is **NOT STARTED**. See [the current Stage 0 completion report](../REVORA_IDE_STAGE0_AUDIT/STAGE0_COMPLETION_REPORT.md). The historical analysis below is retained as context and is not the current branch inventory.\n\n---\n\n# REVORA IDE — Stage 2 Technical Blueprint
 
 ## Entry condition
 
