@@ -4,8 +4,10 @@ import {
   validatePatchProposal,
   computePatchDigest,
   verifyPatchApproval,
-  evaluatePatchApplication
+  evaluatePatchApplication,
+  applyApprovedPatchToWorkspace
 } from "../lib/patch-contract.mjs";
+import { buildWorkspaceManifest } from "../lib/workspace-manifest.mjs";
 
 const baseRevision = "a".repeat(64);
 const proposal = {
@@ -74,4 +76,79 @@ test("application gate rejects stale revisions and requires matching approval", 
   assert.equal(evaluatePatchApplication({
     currentRevision: baseRevision, proposal, approval, now: 0
   }).ok, true);
+});
+
+
+test("approved patch creates a new immutable candidate without mutating input files", () => {
+  const files = { "src/main.js": "export const value = 1;\n" };
+  const manifest = buildWorkspaceManifest(files).manifest;
+  const candidate = {
+    ...proposal,
+    baseRevision: manifest.digest,
+    operations: [
+      { op: "update", path: "src/main.js", content: "export const value = 2;\n" },
+      { op: "create", path: "src/new.js", content: "export {};\n" }
+    ]
+  };
+  const approval = {
+    approved: true,
+    approvedBy: "reviewer-1",
+    patchDigest: computePatchDigest(candidate).digest,
+    expiresAt: "2099-01-01T00:00:00.000Z"
+  };
+
+  const result = applyApprovedPatchToWorkspace({
+    files, currentManifest: manifest, proposal: candidate, approval, now: 0
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(files["src/main.js"], "export const value = 1;\n");
+  assert.equal(files["src/new.js"], undefined);
+  assert.equal(result.files["src/main.js"], "export const value = 2;\n");
+  assert.equal(result.files["src/new.js"], "export {};\n");
+  assert.equal(result.manifest.digest.length, 64);
+  assert.equal(result.parentRevision, manifest.digest);
+});
+
+test("approved patch rejects invalid operation preconditions without partial changes", () => {
+  const files = { "src/main.js": "old" };
+  const manifest = buildWorkspaceManifest(files).manifest;
+  const candidate = {
+    ...proposal,
+    baseRevision: manifest.digest,
+    operations: [
+      { op: "update", path: "src/main.js", content: "new" },
+      { op: "delete", path: "src/missing.js" }
+    ]
+  };
+  const approval = {
+    approved: true,
+    approvedBy: "reviewer-1",
+    patchDigest: computePatchDigest(candidate).digest,
+    expiresAt: "2099-01-01T00:00:00.000Z"
+  };
+  const result = applyApprovedPatchToWorkspace({
+    files, currentManifest: manifest, proposal: candidate, approval, now: 0
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "target-file-does-not-exist");
+  assert.equal(files["src/main.js"], "old");
+});
+
+test("approved patch rejects tampered workspace manifest before applying", () => {
+  const files = { "src/main.js": "old" };
+  const manifest = buildWorkspaceManifest(files).manifest;
+  const candidate = { ...proposal, baseRevision: manifest.digest };
+  const approval = {
+    approved: true,
+    approvedBy: "reviewer-1",
+    patchDigest: computePatchDigest(candidate).digest,
+    expiresAt: "2099-01-01T00:00:00.000Z"
+  };
+  const tamperedManifest = { ...manifest, totalBytes: manifest.totalBytes + 1 };
+  const result = applyApprovedPatchToWorkspace({
+    files, currentManifest: tamperedManifest, proposal: candidate, approval, now: 0
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "manifest-total-size-mismatch");
 });
