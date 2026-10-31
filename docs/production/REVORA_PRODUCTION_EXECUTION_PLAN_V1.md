@@ -38,9 +38,9 @@ Do not convert BLOCKED or NOT VERIFIED into PASS based on documentation, a green
 | Implementation branch | Editor foundation exists on `feat/production-foundation-v1` at `aba136ee93e67ebfd61f02dc79d071c7e37925c6` | PARTIAL | Feature branch not promoted |
 | PR topology | PR #3 is draft and targets `docs/stage0-repository-audit-v42` | BLOCKED | Promotion chain needs explicit review |
 | Branch controls | GitHub listed all four existing branches as unprotected | BLOCKED | No enforced review/check policy |
-| Runtime versions | CI uses Node 20; Docker uses Node 26.13.0; package engine is `>=20` | BLOCKED | Environments may not reproduce |
-| Framework versions | ADR lists Next.js 16.4.3 / React 19.3.1; package manifest lists Next.js 15.1.6 / React 19.0.0 | BLOCKED | Architecture and installed runtime disagree |
-| Dependency graph | No committed `package-lock.json`; CI and Docker use `npm install` | BLOCKED | Transitive dependency resolution is not reproducible |
+| Runtime versions | `.nvmrc`, package engine, CI, and Docker now target Node 26.13.0 on the upgrade branch | PARTIAL | Candidate CI passed; lockfile and release-grade installation remain open |
+| Framework versions | Upgrade branch now pins Next.js 16.4.3 and React/React DOM 19.3.1 to match ADR-0001 | PARTIAL | Upgrade passed CI; clean-install/lockfile and staging checks remain open |
+| Dependency graph | No committed `package-lock.json`; CI uses temporary `npm install` and has not moved to `npm ci` | BLOCKED | Transitive dependency resolution is not reproducible |
 | Editor/workspace | CodeMirror editor and browser-local draft storage | PARTIAL | Not a durable multi-session workspace |
 | API/backend | Liveness and deliberately blocked readiness endpoints only | BLOCKED | No application domain API |
 | Identity/authorization | No implementation | BLOCKED | Cannot safely expose user/project resources |
@@ -92,7 +92,7 @@ No agent may run repository code before G5 has passed. AI patch application must
 ### G0 — Source governance and reproducible toolchain
 
 **Priority:** P0  
-**Current status:** BLOCKED
+**Current status:** PARTIAL — runtime/framework alignment committed; lockfile and branch governance remain BLOCKED
 
 Work:
 - Decide and document the authoritative integration branch and the PR promotion chain.
@@ -390,8 +390,27 @@ Use machine-readable status where possible; never use unverified screenshots or 
 7. Keep all terminal/build/agent execution disabled until G5 passes.
 8. Complete staging/recovery/security evidence before production promotion.
 
-## 10. Current release decision
+
+
+## 11. Verified progress update — 2026-11-01
+
+The following G0 changes have been committed on `feat/holistic-system-upgrade-v1`:
+
+- `.nvmrc` pins Node.js 26.13.0.
+- `package.json` now requires Node.js `>=26.13.0 <27` and pins Next.js 16.4.3 plus React/React DOM 19.3.1.
+- CI now selects Node.js 26.13.0. Docker already used Node.js 26.13.0.
+- README now describes the actual remaining toolchain gate and links this plan and the holistic architecture blueprint.
+
+Evidence:
+- Upgrade branch head: `d9e4c9655ed996c7b236d31edc17c8497c84f658`.
+- Push CI run: [41240262430](https://github.com/StrategyG/REVORA_IDE/actions/runs/41240262430) — SUCCESS. Dependency install, syntax check, unit tests, and Next.js build passed.
+- PR CI run: [41240267731](https://github.com/StrategyG/REVORA_IDE/actions/runs/41240267731) — SUCCESS.
+- Draft PR: [#4](https://github.com/StrategyG/REVORA_IDE/pull/4), targeting `feat/production-foundation-v1`; it remains unmerged.
+
+G0 is still not PASS: there is no committed `package-lock.json`, CI still uses `npm install`, branch protection/rulesets are not enabled, and dependency/license/secret scanning plus container verification have not been proven. The CI result proves only the checks currently defined in that workflow.
+
+## 12. Current release decision
 
 **BLOCKED — foundation preview only.**
 
-This is the correct release decision at the inspected baseline. The existence of a dedicated upgrade branch and architecture plan is progress in planning and governance; it does not mean the missing services have been implemented. No production deployment, main merge, production database mutation, secret installation, or execution enablement is authorized by this plan.
+The completed work improves architecture clarity and aligns the toolchain on a review branch. It does not implement identity, authorization, durable data, AI, patch approval, sandbox execution, operations, or a production deployment.
