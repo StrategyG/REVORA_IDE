@@ -1,19 +1,18 @@
 # REVORA IDE — Implementation Gap Report
 
-**Audit date:** 2026-10-31  
-**Baseline:** main contains only README.md; the separate audit branch contains documentation only. No application source or executable platform components were found.
+**Audit snapshot:** 2026-10-31  
+**Baseline:** `main` contains one README; the pinned audit branch tree contains documentation only. No application source or executable platform component was found in the inspected remote tree.  
+**Evidence:** `STAGE0_EVIDENCE_LEDGER.md`
 
 ## 1. Status interpretation
 
-The following table uses the required implementation vocabulary:
-
-- **BLOCKED** — implementation or verification cannot proceed because the required application/service/prerequisite is absent.
-- **NOT VERIFIED** — evidence is insufficient to establish the state, including systems outside this repository.
-- **NOT RUN** — a test or operation has not been executed.
+- **BLOCKED** — implementation or verification cannot proceed because required application code, service, environment, or prerequisite is absent.
+- **NOT VERIFIED** — evidence is insufficient or the relevant system is outside this repository inspection.
+- **NOT RUN** — a test or operation was executable but has not been executed.
 - **NEEDS REVIEW** — a product, security, or architecture decision requires an explicit decision.
 - **PASS / FAIL** — reserved for an actually verified result.
 
-A missing implementation is not described as a passing feature. No application capability is marked PASS.
+A Stage 0 repository-discovery PASS is not a product capability PASS. No application capability is marked implemented or passing in this report.
 
 ## 2. Current implementation gap matrix
 
@@ -39,16 +38,16 @@ A missing implementation is not described as a passing feature. No application c
 | G-018 | Agent activity/cancellation | BLOCKED | No task/agent lifecycle, lease, events, retry, or cancellation | P2 | Durable queue and worker |
 | G-019 | Approval and audit | BLOCKED | No server-side approval workflow or append-only audit evidence | P0 for protected actions | Identity and action model |
 | G-020 | Responsive Android UX | BLOCKED | No frontend; no desktop/tablet/portrait/landscape behavior can be tested | P1 | G-002, G-007 |
-| G-021 | Accessibility | NOT VERIFIED | No rendered UI, semantic markup, keyboard path, or assistive-technology test | P1 | Frontend implementation |
+| G-021 | Accessibility | BLOCKED | No rendered UI or semantic markup; keyboard and assistive-technology tests cannot run | P1 | Frontend implementation |
 | G-022 | CI and supply-chain controls | BLOCKED | No workflow, lockfile, automated tests, dependency scanning, or build provenance | P0 | G-001 |
 | G-023 | Deployment/operations | BLOCKED | No deployment manifests, secrets configuration, observability, backup, or rollback | P1 | Infrastructure decisions |
-| G-024 | External services/local clones | NOT VERIFIED | Not represented in the inspected remote repository | External | Access to those systems |
+| G-024 | External services/local clones | NOT VERIFIED | Not represented in the inspected remote repository; external/local state was not accessed | External | Access to those systems |
 
 ## 3. Critical risks and ordering constraints
 
 ### P0 — Identity, authorization, and data integrity
 
-The editor cannot safely expose project files until authentication, object-level authorization, workspace isolation, safe path handling, and durable file persistence exist. These controls must be implemented server-side; hiding controls in the UI is not sufficient.
+The editor cannot safely expose project files until authentication, object-level authorization, workspace isolation, safe path handling, and durable file persistence exist. These controls must be enforced server-side; hiding controls in the UI is not sufficient.
 
 ### P0 — Revision lineage and concurrent writes
 
@@ -56,7 +55,7 @@ Save operations must not silently overwrite newer data. Every write must carry a
 
 ### P0 — Execution isolation
 
-Terminal, build scripts, dependency installation, test commands, and agent tools execute potentially untrusted code. They must run in an isolated, resource-limited environment with explicit filesystem, process, network, and credential boundaries. This must be tested before execution is enabled.
+Terminal, build scripts, dependency installation, test commands, and agent tools execute potentially untrusted code. They must run in an isolated, resource-limited environment with explicit filesystem, process, network, and credential boundaries. Isolation must be tested before execution is enabled.
 
 ### P1 — AI output is a proposal, not authority
 
@@ -70,7 +69,7 @@ Build and test results must record the exact source revision and configuration. 
 
 | User stage | Entry prerequisites | Complete vertical slice | Exit evidence |
 |---|---|---|---|
-| 0 — Audit | Repository access | Verified repository map, current-state audit, gaps, acceptance matrix | Stage 0 report and PASS/BLOCKED decision |
+| 0 — Audit | Repository access | Verified repository map, evidence ledger, current-state audit, gaps, acceptance matrix | Stage 0 report and scope-limited PASS/BLOCKED decision |
 | 1 — Architecture/contracts | Stage 0 PASS | Entity contracts, revision/source-of-truth decision, API/event schemas, authorization and security boundaries | Reviewed architecture and typed contracts |
 | 2 — Shell/foundation | Stage 1 PASS; stack chosen | Reproducible app, auth baseline, project context, responsive shell, CI | Build/test logs and route/UI evidence |
 | 3 — File explorer/editor | Real workspace API and storage | Real tree, file operations, multi-file editor, read-only/dirty states | Integration tests against persisted files |
@@ -80,20 +79,22 @@ Build and test results must record the exact source revision and configuration. 
 | 7 — Agents/security/responsive | Core flows operational | Durable task lifecycle, approvals, audit, Android/accessibility and hardening | Negative security and responsive evidence |
 | 8–9 — E2E/release | All preceding gates passed | Full integration, failure recovery, performance, rollback, production review | Final test report and readiness decision |
 
-The stage labels above align with the requested staged sequence; no implementation stage is waived.
+The stage labels align with the requested staged sequence. No acceptance gate is waived.
 
 ## 5. Immediate implementation blockers
 
-1. No application source exists in this repository. The next engineering task is architecture/contracts, not UI generation.
-2. No technology stack can be reused from this repo. A proposed stack must be justified and approved before adding dependencies.
-3. No live backend or external service contracts can be inspected. All required interfaces must first be defined as versioned contracts.
-4. No CI/test infrastructure exists in the inspected tree. A reproducible toolchain and automated quality gates are prerequisites to claiming a build or test PASS.
-5. No execution environment exists in the repository. Do not enable terminal or generated-code execution until the isolation boundary is deployed and tested.
+1. No application source exists in the inspected remote repository. The next engineering task is architecture/contracts, not UI generation.
+2. No technology stack can be reused from this repository. A proposed stack must be justified and approved before dependencies are added.
+3. No live backend or external service contract can be inspected. Required interfaces must first be defined as versioned contracts.
+4. No CI/test infrastructure exists in the inspected tree. A reproducible toolchain and automated quality gates are prerequisites to a build or test PASS.
+5. No execution environment exists in the inspected tree. Do not enable terminal or generated-code execution until an isolation boundary is deployed and tested.
 
 ## 6. Stage 0 conclusion
 
 **Stage 0: PASS — repository discovery and gap identification only.**
 
-This PASS means the accessible remote repository was inspected and its current implementation gaps were documented. It does not mean any product capability, test, security control, or deployment is complete.
+This PASS means the accessible remote repository baseline was inventoried and its implementation gaps were documented against pinned evidence. It does not mean any product capability, application test, security control, or deployment is complete.
 
-The editor remains **NOT READY** for implementation-level acceptance because no application code exists. Stage 1 can proceed with architecture and data contracts; later stages remain blocked until their prerequisites are delivered and verified.
+The editor remains **NOT READY** for implementation-level acceptance because no application code exists in the inspected tree. Stage 1 may proceed with architecture and data contracts; later stages remain blocked until their prerequisites are delivered and verified.
+
+See [Stage 0 execution protocol](STAGE0_EXECUTION_PROTOCOL.md) and [Stage 0 evidence ledger](STAGE0_EVIDENCE_LEDGER.md).
