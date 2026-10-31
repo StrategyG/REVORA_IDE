@@ -434,4 +434,4 @@ Implemented on `feat/holistic-system-upgrade-v1`:
 
 These modules are deliberately not exposed as an API and do not claim to provide authentication, authorization, persistence, transactional database commit, audit logging, or durable rollback. They are tested domain-layer building blocks for G1/G2/G4; the corresponding production gates remain PARTIAL/BLOCKED.
 
-The current CI workflow executes all `tests/*.test.mjs` and syntax-checks the new domain modules. Passing CI must be confirmed at the exact latest branch SHA before this change is accepted.
+The current CI workflow executes all `tests/*.test.mjs` and syntax-checks the new domain modules. At commit `73efb3ef1ccc5a0ed563dfdad0933a6f7d991de8`, push run [41241129461](https://github.com/StrategyG/REVORA_IDE/actions/runs/41241129461) and PR run [41241135044](https://github.com/StrategyG/REVORA_IDE/actions/runs/41241135044) both passed syntax checks, unit tests, Next.js build, and Docker image build. These runs do not close the lockfile, authorization, persistence, sandbox, or operations gates.
