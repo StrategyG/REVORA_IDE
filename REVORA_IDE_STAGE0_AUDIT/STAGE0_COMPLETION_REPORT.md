@@ -2,143 +2,146 @@
 
 **Date:** 2026-10-31  
 **Stage:** 0 — Repository Audit and Technical Discovery  
-**Repository:** StrategyG/REVORA_IDE  
-**Branch:** docs/stage0-repository-audit-v42  
-**Final acceptance:** **PASS — remote repository audit scope**  
-**Application readiness:** **NOT READY**
+**Repository:** `StrategyG/REVORA_IDE`  
+**Working branch:** `docs/stage0-repository-audit-v42`  
+**Final gate:** **PASS — remote repository discovery scope only**  
+**Product readiness:** **NOT READY**
 
-## 1. Stage information
+## 1. Objective and acceptance boundary
 
-### Objective
+Inspect the actual remote repository before application implementation; pin the relevant refs; inventory complete trees; identify existing implementation evidence and gaps; inspect available CI/collaboration signals; record security and data-integrity prerequisites; and publish an evidence-linked Stage 0 gate.
 
-Inspect the actual remote repository before any application implementation, document the existing baseline, identify missing capabilities and security concerns, and justify a dependency-ordered implementation sequence.
+The audit used the remote GitHub API/integration. It did not inspect a local working tree, private external services, or deployment infrastructure. The PASS decision applies only to the remote repository discovery scope.
 
-### Files and repository surfaces inspected
+## 2. Frozen repository evidence
 
-- main/README.md
-- docs/stage1-editor-audit/README.md
-- REVORA_IDE_STAGE1_AUDIT/EDITOR_AUDIT.md
-- REVORA_IDE_STAGE1_AUDIT/EDITOR_ARCHITECTURE_MAP.md
-- REVORA_IDE_STAGE1_AUDIT/EDITOR_IMPLEMENTATION_GAP.md
-- REVORA_IDE_STAGE1_AUDIT/EDITOR_ACCEPTANCE_MATRIX.md
-- REVORA_IDE_STAGE1_AUDIT/EDITOR_ACCEPTANCE_MATRIX_UPLOAD.md
-- REVORA_IDE_STAGE1_AUDIT/EDITOR_REPOSITORY_MAP.md
-- REVORA_IDE_STAGE1_AUDIT/EDITOR_API_AUDIT.md
-- REVORA_IDE_STAGE1_AUDIT/EDITOR_DATA_MODEL_AUDIT.md
-- REVORA_IDE_STAGE1_AUDIT/EDITOR_SECURITY_AUDIT.md
-- REVORA_IDE_STAGE1_AUDIT/EDITOR_RESPONSIVE_AUDIT.md
-- REVORA_IDE_STAGE1_AUDIT/EDITOR_AI_INTEGRATION_AUDIT.md
-- REVORA_IDE_STAGE1_AUDIT/EDITOR_STAGE_2_BLUEPRINT.md
-- Repository metadata, branches, commit history, branch comparison, pull-request search, issue search, and available commit/workflow status information.
+### Initial baseline
 
-The newly created Stage 0 branch was also compared with main after documentation writes to verify the resulting branch delta.
+- Main commit: `b309733779d9bfc2133e9bdacca5899699a9b84e`.
+- Initial Stage 0 audit head: `1fe7a792bb2f8bc7f64cbc00d77f9ef94731c6e2`.
+- Initial Stage 0 recursive tree: `bc9d72cd29eec63f58a9ff472eb310c326698dd4`, `truncated=false`, 20 Markdown blobs.
+- The main tree contained only `README.md`.
+- The initial audit tree contained the root README, six Stage 0 documents, and 13 prior discovery/design documents.
 
-### Files created in this Stage 0 package
+### Revalidation after process hardening
 
-- EDITOR_AUDIT.md
-- EDITOR_ARCHITECTURE_MAP.md
-- EDITOR_IMPLEMENTATION_GAP.md
-- EDITOR_ACCEPTANCE_MATRIX.md
-- README.md
-- STAGE0_COMPLETION_REPORT.md
+- Audit head at revalidation: `067bde967435b01492d76dec8d5f29ec3098883b`.
+- Revalidated tree SHA: `c78c94e2b42d05d4a2688b7f8f263c79ea0c4bd3`.
+- Recursive tree response: `truncated=false`, 22 Markdown blobs.
+- Main-to-audit comparison at that snapshot: 33 commits ahead, 0 behind, 22 changed paths.
+- Prior-audit-to-Stage-0 comparison at that snapshot: 20 commits ahead, 0 behind, 14 changed paths.
 
-### Files modified/deleted
+### Final verification immediately before this report update
 
-- Modified existing files: 0
-- Deleted files: 0
-- Application source files changed: 0
+- Audit head: `47a1ffdf141be351041dba513846ff38a3163e6a`.
+- Tree SHA: `0885499e4f359dbaa3a8935971e0c2c47a1f610f`.
+- Recursive tree response: `truncated=false`, 22 Markdown blobs.
+- Main-to-audit comparison: 34 commits ahead, 0 behind, 22 changed paths.
+- Prior-audit-to-Stage-0 comparison: 21 commits ahead, 0 behind, 14 changed paths.
+- Main remained at `b309733779d9bfc2133e9bdacca5899699a9b84e`.
 
-All six files are documentation additions on the Stage 0 branch.
+The comparison counts are commit ancestry counts, not application implementation counts. The 22 paths consist of a modified root README, eight Stage 0 documents, and 13 historical audit documents. Relative to the earlier audit branch, the 14 paths consist of eight new Stage 0 files, one modified root README, and five modified historical audit documents.
 
-## 2. Implementation status
+## 3. Documents created and revised
 
-### Completed and evidenced
+### Stage 0 package
 
-- Remote repository identity, visibility, default branch metadata, archive state, and available permissions inspected.
-- Default branch and prior audit branch inspected.
-- Prior branch comparison completed: 13 commits ahead of main, 0 behind; 13 documentation files added.
-- Main README and all 13 documentation-branch files were fetched and reviewed.
-- Existing audit inconsistencies and duplicate acceptance-matrix documents were identified.
-- Frontend/backend frameworks, runtime manifests, dependencies, editor library, API implementation, database, persistence, AI integration, execution, build/test, CI, and deployment evidence were checked.
-- Existing editor capability map and missing-functionality list documented.
-- Proposed target architecture separated explicitly from the observed repository.
-- Security and data-integrity prerequisites recorded.
-- Implementation sequence justified by dependency and risk order.
-- Stage 0 acceptance matrix and completion report committed to a dedicated branch.
+The package now contains eight authoritative documents:
 
-### Missing or blocked
+1. `EDITOR_AUDIT.md`
+2. `EDITOR_ARCHITECTURE_MAP.md`
+3. `EDITOR_IMPLEMENTATION_GAP.md`
+4. `EDITOR_ACCEPTANCE_MATRIX.md`
+5. `README.md`
+6. `STAGE0_COMPLETION_REPORT.md`
+7. `STAGE0_EXECUTION_PROTOCOL.md`
+8. `STAGE0_EVIDENCE_LEDGER.md`
 
-No application capability is implemented in the inspected repository. Project/workspace services, file explorer, source editor, file persistence, revisions, AI gateway, patch review/apply, terminal, isolated execution, build/test, artifacts, preview, agents, approvals, and responsive UI remain **BLOCKED** pending architecture and implementation.
+### Work completed in the precision pass
 
-### External dependencies and limitations
+**New documents created:**
+- `STAGE0_EXECUTION_PROTOCOL.md` — exact audit sequence, scope freeze, complete-tree requirement, evidence hierarchy, status semantics, change control, and exit criteria.
+- `STAGE0_EVIDENCE_LEDGER.md` — pinned repository evidence, direct links, commit/tree SHAs, initial and revalidated inventories, and limitations.
 
-The remote audit cannot inspect a local working tree, external databases, cloud storage, identity provider, provider dashboards, runtime hosts, or deployment environments. These remain **NOT VERIFIED**.
+**Existing documents updated:**
+- Root `README.md` — authoritative Stage 0 entry point and product-readiness distinction.
+- `EDITOR_AUDIT.md` — pinned findings, branch lineage, complete tree inventory, and corrected status semantics.
+- `EDITOR_ARCHITECTURE_MAP.md` — current 22-file repository map separated from proposed architecture.
+- `EDITOR_IMPLEMENTATION_GAP.md` — corrected accessibility status to BLOCKED and linked the evidence protocol.
+- `EDITOR_ACCEPTANCE_MATRIX.md` — separate Stage 0 discovery checks from unexecuted product acceptance.
+- Stage 0 `README.md` — explicit reading order and gate interpretation.
+- `STAGE0_EVIDENCE_LEDGER.md` — revalidation evidence appended.
 
-## 3. Test and verification report
+No application source file was created or modified.
 
-| Check | Actual command/action | Actual result | Status |
-|---|---|---|---|
-| Repository metadata | GitHub repository metadata retrieval | Public repository, not archived, default branch main, integration permissions reported | PASS |
-| Branch inventory | GitHub branch search | main and docs/stage1-editor-audit found before Stage 0 branch creation | PASS |
-| Prior branch comparison | Compare main with docs/stage1-editor-audit | 13 commits ahead, 0 behind, 13 files added | PASS |
-| Main README | Fetch README.md from main | Fetched successfully; describes bootstrap repository | PASS |
-| Prior audit documents | Fetch each of the 13 files from docs/stage1-editor-audit | All 13 retrieved and reviewed | PASS |
-| PR and issue search | Search repository PRs and issues | No results returned | PASS |
-| Commit statuses | Fetch combined status for inspected commits | Empty status lists; no CI checks evidenced | PASS |
-| Workflow lookup | Fetch PR-triggered workflow runs for inspected audit commit | Empty workflow-run list | PASS |
-| Manifest/code search | Search for package.json, pyproject.toml, workflow references on default branch | No results; branch/file inspection also found documentation-only tree on prior branch | PASS |
-| Stage 0 package writes | Create six documentation files on dedicated branch | All six create operations returned commit SHAs | PASS |
-| Stage 0 package readback | Fetch four required reports and verify content | All four reports returned successfully | PASS |
-| Final branch comparison | Compare main with docs/stage0-repository-audit-v42 | Branch ahead of main; only the 4 new Stage 0 reports and 13 pre-existing audit-branch documents appear in delta; no application source changes | PASS |
-| Unit/component/integration/E2E tests | No application test runner or source exists | Could not execute | BLOCKED |
-| Build/typecheck/lint | No application manifest or toolchain exists | Could not execute | BLOCKED |
-| Browser/Android test | No frontend application exists | Could not execute | BLOCKED |
-| Security/sandbox test | No application or runtime exists | Could not execute | BLOCKED |
-| Local and external infrastructure inspection | Not exposed by this repository inspection | Evidence unavailable | NOT VERIFIED |
+## 4. Actual repository findings
 
-Important: Empty CI status/workflow results are not treated as passing CI. No application test is claimed as PASS.
+- Repository metadata: public, not archived, not disabled; default branch `main`.
+- Branches returned: `main`, `docs/stage1-editor-audit`, `docs/stage0-repository-audit-v42`.
+- Branch API field `protected=false` for all three at the inspected snapshot; no complete ruleset assessment is claimed.
+- Main complete tree: one README.
+- Audit complete tree: 22 Markdown files, `truncated=false`; no application source or executable runtime files.
+- No package/runtime manifest, lockfile, database schema/migration, test harness, workflow definition, infrastructure file, or deployment manifest was found.
+- Pull request endpoint: empty array.
+- Issue endpoint: empty array.
+- Actions endpoint: zero workflow runs.
+- Audit commit combined status: zero status entries; response state `pending`.
+- Audit commit check runs: zero.
+- Zero status/check results are absence of CI evidence, not a passing CI result.
+- No framework, runtime, database, cloud provider, editor library, or application architecture is inferred.
 
-## 4. Security and regression impact
+## 5. Verification and test report
 
-- Only documentation files were added to a dedicated branch.
-- main was not changed.
-- The previous audit branch was not changed.
-- No source code, runtime configuration, secrets, permissions, production data, or deployment was modified.
-- No application regression test was possible because no application code exists.
-- Critical future security blockers include server-side authentication/authorization, workspace isolation, path safety, secret protection, immutable revision/concurrency semantics, patch approval, and isolated execution.
+| Check | Actual action/result | Status |
+|---|---|---|
+| Repository metadata | Retrieved repository identity, default branch, visibility and archive state | PASS |
+| Branch inventory | Retrieved three branch refs and head SHAs | PASS |
+| Main tree | Recursive tree retrieved; one blob; `truncated=false` | PASS |
+| Audit tree | Recursive tree retrieved; 22 Markdown blobs; `truncated=false` | PASS |
+| Main vs audit comparison | 34 ahead, 0 behind, 22 changed paths at pre-report snapshot | PASS |
+| Prior audit vs Stage 0 comparison | 21 ahead, 0 behind, 14 changed paths at pre-report snapshot | PASS |
+| PR/issues lookup | Empty arrays returned | PASS (observation only) |
+| Workflow lookup | Zero workflow runs returned | PASS (observation only) |
+| Commit status/check runs | Zero status entries and zero check runs; state was pending | PASS (observation only) |
+| File readback | Root README and Stage 0 docs fetched and inspected | PASS |
+| Application build/typecheck/lint | No application source, manifest or toolchain | BLOCKED |
+| Unit/component/integration/E2E | No application source or test harness | BLOCKED |
+| Browser/tablet/Android/accessibility | No frontend to run | BLOCKED |
+| Security/sandbox | No executable application or runtime | BLOCKED |
+| Local working tree/external infrastructure | Not accessible in this remote repository audit | NOT VERIFIED |
 
-No exploitable application vulnerability can be confirmed from a repository without application code. Security controls are not verified and must not be presumed present.
+No application test was reported as PASS. No build was attempted against an absent project. No empty workflow/status response was treated as CI success.
 
-## 5. Acceptance gate
+## 6. Security and regression impact
 
-**Stage 0: PASS — remote repository audit scope only.**
+- Changes in this pass are documentation-only.
+- No application source, runtime configuration, production data, secrets, permissions, or deployment was modified.
+- `main` was not changed.
+- The earlier audit branch was not changed.
+- No PR, merge, or deployment was performed.
+- No application regression test could run because no application code exists in the inspected tree.
+- Security controls remain unverified and must not be presumed present.
 
-Evidence:
+## 7. Stage 0 gate decision
 
-1. Repository structure documented for main and the existing documentation branch.
-2. Existing technology/dependencies identified as absent from the inspected remote source tree; no unsupported stack assumptions introduced.
-3. Current editor capabilities mapped as not implemented in this repository.
-4. Missing capabilities and dependencies recorded.
-5. Dependency-ordered implementation roadmap recorded.
-6. Existing documentation inaccuracies and duplicate files recorded.
-7. Only new documentation files were added on a dedicated branch; no destructive changes were made.
+**Stage 0: PASS — remote GitHub repository discovery only.**
 
-Scope limitations remain explicit: local working tree and external systems are **NOT VERIFIED**.
+The mandatory discovery evidence is available and internally linked. The full tree responses are not truncated; baseline and audit refs are pinned; branch differences are measured against both main and the prior audit branch; the current state is classified without inferring product features; empty CI evidence is not mislabeled; and local/external limitations remain explicit.
 
-**Product decision: NOT READY.** This is separate from the Stage 0 audit result.
+**Product decision: NOT READY.** The editor has no verified application implementation in the inspected repository. Authentication, authorization, workspace isolation, persistence, revisions, AI gateway, patch lifecycle, sandbox, build/test, artifact/preview, agent runtime, responsive UI, and release operations remain blocked.
 
-## 6. Next stage
+## 8. Stage 1 entry criteria
 
-Stage 1 — Architecture and Data Contract.
+Stage 1 — Architecture and Data Contract — may begin on a separately tracked branch.
 
-Entry prerequisites:
+It must define and review:
+- user/tenant/project/workspace ownership and backend authorization;
+- Git-backed versus blob/revision-native source of truth;
+- typed entities, immutable revisions, concurrency and recovery semantics;
+- versioned API/event contracts;
+- AI provider governance, revision-pinned context and credential policy;
+- patch validation, approval classes and audit records;
+- terminal/build sandbox isolation and resource/network boundaries;
+- runtime/deployment target, residency, backup and recovery objectives.
 
-- Define user/tenant/project ownership and server-side authorization boundaries.
-- Decide Git-backed workspace versus blob/revision-native source of truth.
-- Define entity schemas and revision lineage.
-- Define save, draft recovery, optimistic concurrency, conflict, and restore contracts.
-- Define versioned API and event contracts.
-- Define AI provider governance, credential protection, and revision-pinned context.
-- Define terminal/build sandbox isolation and execution approval rules.
-
-Do not begin Stage 2 UI implementation until Stage 1 contracts are reviewed and accepted. Do not merge to main or deploy without explicit authorization.
+Do not begin UI implementation until these contracts are reviewed. Stage 0 PASS does not authorize a merge to `main`, Stage 2 implementation, or production deployment.
