@@ -56,7 +56,7 @@ test("approval is bound to exact patch digest and expiry", () => {
   };
   assert.equal(verifyPatchApproval(proposal, approval, 0).ok, true);
   assert.equal(verifyPatchApproval(proposal, { ...approval, patchDigest: "0".repeat(64) }, 0).reason, "approval-digest-mismatch");
-  assert.equal(verifyPatchApproval(proposal, { ...approval, expiresAt: "2000-01-01T00:00:00.000Z" }, 0).reason, "approval-expired-or-invalid");
+  assert.equal(verifyPatchApproval(proposal, { ...approval, expiresAt: "2000-01-01T00:00:00.000Z" }, 1_000_000_000_000).reason, "approval-expired-or-invalid");
 });
 
 test("application gate rejects stale revisions and requires matching approval", () => {
