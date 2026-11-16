@@ -98,3 +98,8 @@ The container runs as a non-root user and has a liveness healthcheck. This is no
 - Keep `main` and production deployment unchanged until the source-of-truth and promotion topology is reviewed and approved.
 
 The `/api/readyz` endpoint intentionally returns HTTP 503 until required identity, data, security, runtime, operations, and recovery integrations have been implemented and verified.
+
+
+## React DevOps IDE v6 module
+
+A standalone React DevOps IDE v6 integration scaffold and dedicated GitHub Actions workflow are provided separately from the REVORA IDE Next.js application. See [the integration guide](docs/integrations/REACT_DEVOPS_IDE_V6.md). Add the source package under `tools/react-devops-ide-v6/` to activate the v6 validation and deployment jobs.

@@ -1,0 +1,272 @@
+name: React DevOps IDE v6
+
+on:
+  push:
+    branches: [main, "feat/**"]
+    paths:
+      - "tools/react-devops-ide-v6/**"
+      - "tools/react-devops-ide-v6-source.zip"
+      - ".github/workflows/react-devops-ide-v6.yml"
+      - "docs/integrations/REACT_DEVOPS_IDE_V6.md"
+  pull_request:
+    branches: [main, "feat/holistic-system-upgrade-v1"]
+    paths:
+      - "tools/react-devops-ide-v6/**"
+      - "tools/react-devops-ide-v6-source.zip"
+      - ".github/workflows/react-devops-ide-v6.yml"
+      - "docs/integrations/REACT_DEVOPS_IDE_V6.md"
+  workflow_dispatch:
+    inputs:
+      deploy_environment:
+        description: Deployment target
+        required: true
+        type: choice
+        default: none
+        options: [none, staging, production]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: react-devops-v6-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-check:
+    name: Check standalone module source
+    runs-on: ubuntu-latest
+    outputs:
+      has_source: ${{ steps.source.outputs.has_source }}
+      source_archive: ${{ steps.source.outputs.source_archive }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Report source status
+        id: source
+        shell: bash
+        run: |
+          if [[ -f tools/react-devops-ide-v6/package.json ]]; then
+            echo "has_source=true" >> "$GITHUB_OUTPUT"
+            echo "source_archive=false" >> "$GITHUB_OUTPUT"
+            echo "v6 source directory found."
+          elif [[ -f tools/react-devops-ide-v6-source.zip ]] && unzip -Z1 tools/react-devops-ide-v6-source.zip | grep -qx 'react-devops-ide-v6/package.json'; then
+            echo "has_source=true" >> "$GITHUB_OUTPUT"
+            echo "source_archive=true" >> "$GITHUB_OUTPUT"
+            echo "v6 source archive found; validation jobs will extract it."
+          else
+            echo "has_source=false" >> "$GITHUB_OUTPUT"
+            echo "source_archive=false" >> "$GITHUB_OUTPUT"
+            echo "::error title=Missing v6 source::Upload react-devops-ide-v6-source.zip to tools/react-devops-ide-v6-source.zip, or commit tools/react-devops-ide-v6/. Refusing a green check while validation is skipped."
+            exit 1
+          fi
+
+  validate:
+    name: Validate v6 backend, workspace and container
+    needs: source-check
+    if: needs.source-check.outputs.has_source == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Extract standalone source archive
+        if: hashFiles('tools/react-devops-ide-v6-source.zip') != ''
+        run: unzip -q tools/react-devops-ide-v6-source.zip -d tools
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: "22"
+      - name: Install backend dependencies
+        working-directory: tools/react-devops-ide-v6
+        run: npm install --no-audit --no-fund
+      - name: Backend syntax checks
+        working-directory: tools/react-devops-ide-v6
+        run: npm run check
+      - name: Backend API and CI/CD tests
+        working-directory: tools/react-devops-ide-v6
+        run: npm test
+      - name: Workspace tests and build
+        working-directory: tools/react-devops-ide-v6
+        run: |
+          npm run workspace:test
+          npm run build
+      - name: Dependency audit
+        working-directory: tools/react-devops-ide-v6
+        run: npm audit --audit-level=high
+      - name: Scan source and dependencies
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        with:
+          scan-type: fs
+          scan-ref: tools/react-devops-ide-v6
+          scanners: vuln,misconfig,secret
+          version: v0.76.2
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
+      - name: Build container image
+        run: docker build --pull -t react-devops-ide-v6:ci tools/react-devops-ide-v6
+
+  publish:
+    name: Build and publish immutable GHCR image
+    needs: validate
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.deploy_environment != 'none')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.image.outputs.name }}
+      tag: ${{ steps.image.outputs.tag }}
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Extract standalone source archive
+        if: hashFiles('tools/react-devops-ide-v6-source.zip') != ''
+        run: unzip -q tools/react-devops-ide-v6-source.zip -d tools
+      - name: Define image coordinates
+        id: image
+        shell: bash
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+          TAG="sha-${GITHUB_SHA}"
+          echo "name=$IMAGE" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+      - name: Authenticate to GHCR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+      - name: Build and push with SBOM and provenance
+        id: build
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+          TAG: ${{ steps.image.outputs.tag }}
+        run: |
+          docker buildx build             --file tools/react-devops-ide-v6/Dockerfile             --tag "$IMAGE:$TAG"             --push             --sbom=true             --provenance=true             --metadata-file /tmp/build-metadata.json             tools/react-devops-ide-v6
+          DIGEST="$(jq -r '."containerimage.digest" // empty' /tmp/build-metadata.json)"
+          test -n "$DIGEST"
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Published React DevOps IDE v6 image"
+            echo "- Image: $IMAGE"
+            echo "- Tag: $TAG"
+            echo "- Digest: $DIGEST"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Scan published image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        with:
+          scan-type: image
+          image-ref: ${{ steps.image.outputs.name }}:${{ steps.image.outputs.tag }}
+          version: v0.76.2
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
+
+  deploy-staging:
+    name: Deploy to Minikube staging
+    needs: publish
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_environment == 'staging'
+    runs-on: [self-hosted, linux, x64, devops-staging]
+    environment:
+      name: staging
+    permissions:
+      contents: read
+      packages: read
+    env:
+      IMAGE: ${{ needs.publish.outputs.image }}
+      IMAGE_DIGEST: ${{ needs.publish.outputs.digest }}
+      K8S_CONTEXT: ${{ vars.STAGING_KUBE_CONTEXT || 'minikube' }}
+      K8S_NAMESPACE: ${{ vars.STAGING_K8S_NAMESPACE || 'devops-staging' }}
+      GHCR_PULL_USER: ${{ secrets.GHCR_PULL_USER }}
+      GHCR_PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Extract standalone source archive
+        if: hashFiles('tools/react-devops-ide-v6-source.zip') != ''
+        run: unzip -q tools/react-devops-ide-v6-source.zip -d tools
+      - name: Verify staging cluster and namespace
+        run: |
+          kubectl --context "$K8S_CONTEXT" get nodes
+          kubectl --context "$K8S_CONTEXT" create namespace "$K8S_NAMESPACE" --dry-run=client -o yaml | kubectl --context "$K8S_CONTEXT" apply -f -
+      - name: Configure GHCR pull secret
+        run: |
+          test -n "$GHCR_PULL_USER"
+          test -n "$GHCR_PULL_TOKEN"
+          umask 077
+          DOCKER_CONFIG_DIR="$(mktemp -d)"
+          trap 'rm -rf "$DOCKER_CONFIG_DIR"' EXIT
+          AUTH="$(printf '%s:%s' "$GHCR_PULL_USER" "$GHCR_PULL_TOKEN" | base64 | tr -d '\n')"
+          printf '{"auths":{"ghcr.io":{"auth":"%s"}}}' "$AUTH" > "$DOCKER_CONFIG_DIR/config.json"
+          kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" create secret generic ghcr-pull             --type=kubernetes.io/dockerconfigjson             --from-file=.dockerconfigjson="$DOCKER_CONFIG_DIR/config.json"             --dry-run=client -o yaml | kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" apply -f -
+      - name: Apply RBAC, deployment and service
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP_DIR=tools/react-devops-ide-v6
+          sed "s/namespace: devops-playground/namespace: $K8S_NAMESPACE/g" "$APP_DIR/k8s/rbac-readonly.yaml" | kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" apply -f -
+          sed -e "s#ghcr.io/owner/repository:latest#$IMAGE@$IMAGE_DIGEST#g"               -e "s#value: \"devops-playground\"#value: \"$K8S_NAMESPACE\"#g"               "$APP_DIR/k8s/deployment.yaml" | kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" apply -f -
+          kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" apply -f "$APP_DIR/k8s/service.yaml"
+      - name: Verify rollout and roll back on failure
+        shell: bash
+        run: |
+          if ! kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" rollout status deployment/playground-devops --timeout=180s; then
+            kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" rollout undo deployment/playground-devops || true
+            kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" rollout status deployment/playground-devops --timeout=120s || true
+            exit 1
+          fi
+          kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" get deployments,pods,services -o wide
+
+  deploy-production:
+    name: Deploy to protected production
+    needs: publish
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_environment == 'production'
+    runs-on: [self-hosted, linux, x64, devops-production]
+    environment:
+      name: production
+    permissions:
+      contents: read
+      packages: read
+    env:
+      IMAGE: ${{ needs.publish.outputs.image }}
+      IMAGE_DIGEST: ${{ needs.publish.outputs.digest }}
+      K8S_CONTEXT: ${{ vars.PRODUCTION_KUBE_CONTEXT }}
+      K8S_NAMESPACE: ${{ vars.PRODUCTION_K8S_NAMESPACE || 'devops-production' }}
+      GHCR_PULL_USER: ${{ secrets.GHCR_PULL_USER }}
+      GHCR_PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Extract standalone source archive
+        if: hashFiles('tools/react-devops-ide-v6-source.zip') != ''
+        run: unzip -q tools/react-devops-ide-v6-source.zip -d tools
+      - name: Verify production cluster and namespace
+        run: |
+          test -n "$K8S_CONTEXT"
+          kubectl --context "$K8S_CONTEXT" get nodes
+          kubectl --context "$K8S_CONTEXT" create namespace "$K8S_NAMESPACE" --dry-run=client -o yaml | kubectl --context "$K8S_CONTEXT" apply -f -
+      - name: Configure GHCR pull secret
+        run: |
+          test -n "$GHCR_PULL_USER"
+          test -n "$GHCR_PULL_TOKEN"
+          umask 077
+          DOCKER_CONFIG_DIR="$(mktemp -d)"
+          trap 'rm -rf "$DOCKER_CONFIG_DIR"' EXIT
+          AUTH="$(printf '%s:%s' "$GHCR_PULL_USER" "$GHCR_PULL_TOKEN" | base64 | tr -d '\n')"
+          printf '{"auths":{"ghcr.io":{"auth":"%s"}}}' "$AUTH" > "$DOCKER_CONFIG_DIR/config.json"
+          kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" create secret generic ghcr-pull             --type=kubernetes.io/dockerconfigjson             --from-file=.dockerconfigjson="$DOCKER_CONFIG_DIR/config.json"             --dry-run=client -o yaml | kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" apply -f -
+      - name: Apply RBAC, deployment and service
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP_DIR=tools/react-devops-ide-v6
+          sed "s/namespace: devops-playground/namespace: $K8S_NAMESPACE/g" "$APP_DIR/k8s/rbac-readonly.yaml" | kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" apply -f -
+          sed -e "s#ghcr.io/owner/repository:latest#$IMAGE@$IMAGE_DIGEST#g"               -e "s#value: \"devops-playground\"#value: \"$K8S_NAMESPACE\"#g"               "$APP_DIR/k8s/deployment.yaml" | kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" apply -f -
+          kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" apply -f "$APP_DIR/k8s/service.yaml"
+      - name: Verify rollout and roll back on failure
+        shell: bash
+        run: |
+          if ! kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" rollout status deployment/playground-devops --timeout=300s; then
+            kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" rollout undo deployment/playground-devops || true
+            kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" rollout status deployment/playground-devops --timeout=180s || true
+            exit 1
+          fi
+          kubectl --context "$K8S_CONTEXT" --namespace "$K8S_NAMESPACE" get deployments,pods,services -o wide
