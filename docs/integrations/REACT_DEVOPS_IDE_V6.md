@@ -4,7 +4,11 @@ This integration keeps the standalone React DevOps IDE v6 separate from REVORA I
 
 ## Add the v6 source package
 
-Download `react-devops-ide-v6-source.zip` from the project conversation, then from the REVORA IDE repository root:
+Download `react-devops-ide-v6-source.zip` from the project conversation. There are two supported ways to add it:
+
+**Option A — upload the archive directly (simplest):** upload the ZIP into the repository path `tools/react-devops-ide-v6-source.zip` using GitHub's web interface, then commit the upload. The CI workflow detects this archive and extracts it before validation, image build, or deployment.
+
+**Option B — extract locally:** from the REVORA IDE repository root:
 
 ```bash
 unzip react-devops-ide-v6-source.zip -d tools
@@ -13,7 +17,7 @@ git commit -m "feat: add React DevOps IDE v6 module"
 git push
 ```
 
-The archive expands to `tools/react-devops-ide-v6/`. It excludes `.env`, credentials, `node_modules`, runtime JSON state, and generated build output.
+Both methods create `tools/react-devops-ide-v6/` for the CI jobs. The archive excludes `.env`, credentials, `node_modules`, runtime JSON state, and generated build output.
 
 ## Run locally
 
