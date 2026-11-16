@@ -5,6 +5,7 @@ on:
     branches: [main, "feat/**"]
     paths:
       - "tools/react-devops-ide-v6/**"
+      - "tools/react-devops-ide-v6-source.zip"
       - ".github/workflows/react-devops-ide-v6.yml"
       - "docs/integrations/REACT_DEVOPS_IDE_V6.md"
   pull_request:
@@ -35,6 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       has_source: ${{ steps.source.outputs.has_source }}
+      source_archive: ${{ steps.source.outputs.source_archive }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Report source status
@@ -43,10 +45,16 @@ jobs:
         run: |
           if [[ -f tools/react-devops-ide-v6/package.json ]]; then
             echo "has_source=true" >> "$GITHUB_OUTPUT"
-            echo "v6 source package found."
+            echo "source_archive=false" >> "$GITHUB_OUTPUT"
+            echo "v6 source directory found."
+          elif [[ -f tools/react-devops-ide-v6-source.zip ]] && unzip -Z1 tools/react-devops-ide-v6-source.zip | grep -qx 'react-devops-ide-v6/package.json'; then
+            echo "has_source=true" >> "$GITHUB_OUTPUT"
+            echo "source_archive=true" >> "$GITHUB_OUTPUT"
+            echo "v6 source archive found; validation jobs will extract it."
           else
             echo "has_source=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::v6 source not installed yet. Extract react-devops-ide-v6-source.zip into tools/ and commit tools/react-devops-ide-v6/."
+            echo "source_archive=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Upload react-devops-ide-v6-source.zip to tools/react-devops-ide-v6-source.zip, or commit the extracted tools/react-devops-ide-v6/ directory."
             echo "The standalone v6 validation, publish and deployment jobs are intentionally skipped until the source is present."
           fi
 
@@ -58,6 +66,9 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Extract standalone source archive
+        if: needs.source-check.outputs.source_archive == 'true'
+        run: unzip -q tools/react-devops-ide-v6-source.zip -d tools
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
           node-version: "22"
@@ -108,6 +119,9 @@ jobs:
       digest: ${{ steps.build.outputs.digest }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Extract standalone source archive
+        if: needs.source-check.outputs.source_archive == 'true'
+        run: unzip -q tools/react-devops-ide-v6-source.zip -d tools
       - name: Define image coordinates
         id: image
         shell: bash
@@ -166,6 +180,9 @@ jobs:
       GHCR_PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Extract standalone source archive
+        if: needs.source-check.outputs.source_archive == 'true'
+        run: unzip -q tools/react-devops-ide-v6-source.zip -d tools
       - name: Verify staging cluster and namespace
         run: |
           kubectl --context "$K8S_CONTEXT" get nodes
@@ -217,6 +234,9 @@ jobs:
       GHCR_PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Extract standalone source archive
+        if: needs.source-check.outputs.source_archive == 'true'
+        run: unzip -q tools/react-devops-ide-v6-source.zip -d tools
       - name: Verify production cluster and namespace
         run: |
           test -n "$K8S_CONTEXT"
