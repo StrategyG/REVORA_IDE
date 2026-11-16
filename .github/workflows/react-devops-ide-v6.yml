@@ -121,7 +121,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Extract standalone source archive
-        if: needs.source-check.outputs.source_archive == 'true'
+        if: hashFiles('tools/react-devops-ide-v6-source.zip') != ''
         run: unzip -q tools/react-devops-ide-v6-source.zip -d tools
       - name: Define image coordinates
         id: image
@@ -182,7 +182,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Extract standalone source archive
-        if: needs.source-check.outputs.source_archive == 'true'
+        if: hashFiles('tools/react-devops-ide-v6-source.zip') != ''
         run: unzip -q tools/react-devops-ide-v6-source.zip -d tools
       - name: Verify staging cluster and namespace
         run: |
@@ -236,7 +236,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Extract standalone source archive
-        if: needs.source-check.outputs.source_archive == 'true'
+        if: hashFiles('tools/react-devops-ide-v6-source.zip') != ''
         run: unzip -q tools/react-devops-ide-v6-source.zip -d tools
       - name: Verify production cluster and namespace
         run: |
