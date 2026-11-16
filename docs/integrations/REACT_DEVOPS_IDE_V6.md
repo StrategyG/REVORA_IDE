@@ -1,6 +1,6 @@
 # React DevOps IDE v6 integration
 
-This integration keeps the standalone React DevOps IDE v6 separate from REVORA IDE's Next.js application. The source package is delivered as `react-devops-ide-v6-source.zip` and is not embedded in this PR; add it to the repository using the steps below. The workflow is deliberately configured to skip v6 jobs until the source directory exists.
+This integration keeps the standalone React DevOps IDE v6 separate from REVORA IDE's Next.js application. The source package is delivered as `react-devops-ide-v6-source.zip` and is not embedded in this PR; add it to the repository using the steps below. The workflow fails its source-check until either the archive or extracted source directory is committed. This prevents a misleading green PR check while all v6 validation jobs are skipped.
 
 ## Add the v6 source package
 
