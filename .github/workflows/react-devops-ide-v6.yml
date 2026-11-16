@@ -33,22 +33,27 @@ jobs:
   source-check:
     name: Check standalone module source
     runs-on: ubuntu-latest
+    outputs:
+      has_source: ${{ steps.source.outputs.has_source }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Report source status
+        id: source
         shell: bash
         run: |
           if [[ -f tools/react-devops-ide-v6/package.json ]]; then
+            echo "has_source=true" >> "$GITHUB_OUTPUT"
             echo "v6 source package found."
           else
+            echo "has_source=false" >> "$GITHUB_OUTPUT"
             echo "::notice::v6 source not installed yet. Extract react-devops-ide-v6-source.zip into tools/ and commit tools/react-devops-ide-v6/."
             echo "The standalone v6 validation, publish and deployment jobs are intentionally skipped until the source is present."
           fi
 
   validate:
     name: Validate v6 backend, workspace and container
-    if: ${{ hashFiles('tools/react-devops-ide-v6/package.json') != '' }}
     needs: source-check
+    if: needs.source-check.outputs.has_source == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
