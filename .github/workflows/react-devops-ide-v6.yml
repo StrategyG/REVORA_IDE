@@ -55,8 +55,8 @@ jobs:
           else
             echo "has_source=false" >> "$GITHUB_OUTPUT"
             echo "source_archive=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Upload react-devops-ide-v6-source.zip to tools/react-devops-ide-v6-source.zip, or commit the extracted tools/react-devops-ide-v6/ directory."
-            echo "The standalone v6 validation, publish and deployment jobs are intentionally skipped until the source is present."
+            echo "::error title=Missing v6 source::Upload react-devops-ide-v6-source.zip to tools/react-devops-ide-v6-source.zip, or commit tools/react-devops-ide-v6/. Refusing a green check while validation is skipped."
+            exit 1
           fi
 
   validate:
