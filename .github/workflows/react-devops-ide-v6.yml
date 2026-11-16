@@ -12,6 +12,7 @@ on:
     branches: [main, "feat/holistic-system-upgrade-v1"]
     paths:
       - "tools/react-devops-ide-v6/**"
+      - "tools/react-devops-ide-v6-source.zip"
       - ".github/workflows/react-devops-ide-v6.yml"
       - "docs/integrations/REACT_DEVOPS_IDE_V6.md"
   workflow_dispatch:
@@ -67,7 +68,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Extract standalone source archive
-        if: needs.source-check.outputs.source_archive == 'true'
+        if: hashFiles('tools/react-devops-ide-v6-source.zip') != ''
         run: unzip -q tools/react-devops-ide-v6-source.zip -d tools
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
