@@ -4,20 +4,20 @@ This integration keeps the standalone React DevOps IDE v6 separate from REVORA I
 
 ## Add the v6 source package
 
-Download `react-devops-ide-v6-source.zip` from the project conversation. There are two supported ways to add it:
+Download `react-devops-ide-v6-source-hardened.zip` from the project conversation. There are two supported ways to add it:
 
 **Option A — upload the archive directly (simplest):** upload the ZIP into the repository path `tools/react-devops-ide-v6-source.zip` using GitHub's web interface, then commit the upload. The CI workflow detects this archive and extracts it before validation, image build, or deployment.
 
 **Option B — extract locally:** from the REVORA IDE repository root:
 
 ```bash
-unzip react-devops-ide-v6-source.zip -d tools
+unzip react-devops-ide-v6-source-hardened.zip -d tools
 git add tools/react-devops-ide-v6
 git commit -m "feat: add React DevOps IDE v6 module"
 git push
 ```
 
-Both methods create `tools/react-devops-ide-v6/` for the CI jobs. The archive excludes `.env`, credentials, `node_modules`, runtime JSON state, and generated build output.
+Both methods create `tools/react-devops-ide-v6/` for the CI jobs. The archive excludes `.env`, credentials, `node_modules`, runtime JSON state, and generated build output. The backend image runs as the unprivileged Node user; the Kubernetes pod also sets a non-root UID/GID, RuntimeDefault seccomp profile, drops all Linux capabilities, and disables privilege escalation.
 
 ## Run locally
 
@@ -72,4 +72,4 @@ Production is never triggered by a push. It requires manual workflow dispatch an
 - A passing PR CI run proves validation/build only. It does not prove GitHub workflow dispatch, GHCR publication, self-hosted runner connectivity, or Kubernetes deployment.
 - The backend's JSON run store is single-process local persistence; PostgreSQL/Redis and full multi-user RBAC are follow-on work.
 - The standalone backend currently has no committed root lockfile. CI uses `npm install` and `npm audit`; dependency resolution is not yet fully reproducible. Commit a reviewed lockfile and switch to `npm ci` before production release.
-- Keep the IDE backend local-only until full authentication, authorization, CSRF protection, rate limiting, and secret management are implemented.
+- Keep the IDE backend local-only until full authentication, authorization, CSRF protection, rate limiting, and secret management are implemented. `CICD_API_TOKEN` protects CI/CD write routes only; workspace file, Git, and task APIs still require a trusted local boundary or authenticated reverse proxy.
